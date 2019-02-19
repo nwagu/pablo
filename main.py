@@ -1,12 +1,10 @@
 import sys
 
-from pabloview import PabloView
-from PySide2 import QtCore
-from PySide2.QtCore import Qt, QUrl
-from PySide2.QtGui import QCloseEvent, QKeySequence, QIcon, QPixmap, QIcon
-from PySide2.QtWidgets import (qApp, QAction, QApplication, QDesktopWidget,
-    QDockWidget, QLabel, QLineEdit, QMainWindow, QMenu, QMenuBar, QPushButton,
-    QStatusBar, QToolBar, QSplashScreen, QMessageBox)
+# from pabloview import PabloView
+from pagedtextedit import PagedTextEdit
+from PySide2.QtCore import *
+from PySide2.QtGui import *
+from PySide2.QtWidgets import *
 
 main_windows = []
 
@@ -27,17 +25,35 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('Pablo Editor')
         self.setWindowIcon(QIcon('images/icon.png'))
 
-        self.pablo_view = PabloView()
+        self.paged_text_edit = PagedTextEdit()
+
+        bkgnd = QPixmap("images/bkg1.jpg");
+        bkgnd = bkgnd.scaled(self.size(), Qt.IgnoreAspectRatio);
+        palette = QPalette()
+        palette.setBrush(QPalette.Window, bkgnd)
+
+        self.paged_text_edit.setPalette(palette)
+        self.paged_text_edit.setAutoFillBackground(True)
+        self.doc = QTextDocument()
+        font = QFont()
+        font.setPointSize(20)
+        font.setFamily('Calibri')
+        self.doc.setDefaultFont(font)
+        self.paged_text_edit.setDocument(self.doc)
+        self.paged_text_edit.setPageFormat(QPageSize.A5);
+        self.paged_text_edit.setPageMargins(QMarginsF(15, 15, 15, 15));
+        self.paged_text_edit.setUsePageMode(True);
+        self.paged_text_edit.setAddSpaceToBottom(False) # not needed in paged mode
+        self.paged_text_edit.setPageNumbersAlignment(Qt.AlignBottom | Qt.AlignRight);
+        self.paged_text_edit.resize(400, 1000); # This does not work
+
+        self.paged_text_edit.setText(open("files/chekhov.pbl").read())
         self.setWindowState(Qt.WindowFullScreen)
         self.setWindowState(Qt.WindowMaximized)
-        self.setCentralWidget(self.pablo_view)
+        self.setCentralWidget(self.paged_text_edit)
 
-        self._find_tool_bar = None
-
-        self.fileName = None
-        self.filters = "Text files (*.txt)"
-
-        
+        # self.fileName = None
+        # self.filters = "Text files (*.txt)"
 
     def _setup_components(self):
         self._create_menus()
@@ -45,7 +61,8 @@ class MainWindow(QMainWindow):
         self._create_tool_bar()
         self.myStatusBar = QStatusBar()
         self.setStatusBar(self.myStatusBar)
-        self.myStatusBar.showMessage('Ready', 10000)
+        self.myStatusBar.showMessage('Ready')
+        # self.myStatusBar.showMessage('Ready', 10000)
 
         self.file_menu.addAction(self.new_action)
         self.file_menu.addAction(self.open_action)
@@ -76,7 +93,6 @@ class MainWindow(QMainWindow):
         self.main_tool_bar.addSeparator()
         self.main_tool_bar.addAction(self.undo_action)
         self.main_tool_bar.addAction(self.redo_action)
-
 
     def _create_actions(self):
         self.new_action  = QAction( QIcon('images/new.png'), '&New', self, shortcut=QKeySequence.New, 
@@ -171,7 +187,7 @@ class MainWindow(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    pixmap = QPixmap("images/boine.png")
+    pixmap = QPixmap("images/splash.png")
     splash = QSplashScreen(pixmap)
     splash.show()
     app.processEvents()
