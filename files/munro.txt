@@ -1,37 +1,19 @@
-A Red Dress
-by Alice Munro
-My mother was making me a dress. All through the month of November I would come from
-school and find her in the kitchen, surrounded by cutup red velvet and scraps of tissue-
-paper pattern. She worked at an old treadle machine pushed up against the window to get 
-the light, and also to let her look out, past the stubble fields and bare vegetable garden, to 
-see who went by on the road. There was seldom anybody to see.
-The red velvet material was hard to work with, it pulled, and the style my mother had 
-chosen was not easy either. She was not really a good sewer. She liked to make things; that 
-is different. Whenever she could she tried to skip basting and pressing and she took no pride 
-in the fine points of tailoring, the finishing of buttonholes and the over-casting of seams as, 
-for instance, my aunt and my grandmother did. Unlike them she started off with an 
-inspiration, a brave and dazzling idea; from that moment on, her pleasure ran downhill. In 
-the first place she could never find a pattern to suit her. It was no wonder; there were no 
-patterns made to match the ideas that blossomed in her head. She had made me, at various 
-times when I was younger, a flowered organdie dress with a high Victorian neckline edged in 
-scratchy lace, with a poke bonnet to match; a Scottish plaid outfit with a velvet jacket and 
-tam; an embroidered peasant blouse worn with a full red skirt and black laced bodice. I had 
-worn these clothes with docility, even pleasure, in the days when I was unaware of the 
-world’s opinion. Now, grown wiser, I wished for dresses like those my friend Lonnie had, 
-bought at Beale’s store.
-I had to try it on. Sometimes Lonnie came home from school with me and she would sit on 
-the couch watching. I was embarrassed by the way my mother crept around me, her knees
-creaking, her breath coming heavily. She muttered to herself. Around the house she wore 
-no corset or stockings, she wore wedge-heeled shoes and ankle socks; her legs were marked 
-with lumps of blue-green veins. I thought her squatting position shameless, even obscene; I 
-tried to keep talking to Lonnie so that her attention would be taken away from my mother 
-as much as possible. Lonnie wore the composed, polite, appreciative expression that was 
-her disguise in the presence of grownups. She laughed at them and was a ferocious mimic, 
-and they never knew. My mother pulled me about, and pricked me with pins. She made me 
-turn around, she made me walk away, she made me stand still. “What do you think of it, 
-Lonnie?” she said around the pins in her mouth.
-“It’s beautiful,” said Lonnie, in her mild, sincere way. Lonnie’s own mother was dead. She 
-lived with her father who never noticed her, and this, in my eyes, made her seem both 
+		A Red Dress
+	          by Alice Munro
+
+My mother was making me a dress. All through the month of November I would come from school and find her in the kitchen, surrounded by cutup red velvet and scraps of tissue-paper pattern. She worked at an old treadle machine pushed up against the window to get 
+the light, and also to let her look out, past the stubble fields and bare vegetable garden, to see who went by on the road. There was seldom anybody to see.
+
+The red velvet material was hard to work with, it pulled, and the style my mother had chosen was not easy either. She was not really a good sewer. She liked to make things; that is different. Whenever she could she tried to skip basting and pressing and she took no pride in the fine points of tailoring, the finishing of buttonholes and the over-casting of seams as, for instance, my aunt and my grandmother did. Unlike them she started off with an inspiration, a brave and dazzling idea; from that moment on, her pleasure ran downhill. In the first place she could never find a pattern to suit her. It was no wonder; there were no 
+patterns made to match the ideas that blossomed in her head. She had made me, at various times when I was younger, a flowered organdie dress with a high Victorian neckline edged in 
+scratchy lace, with a poke bonnet to match; a Scottish plaid outfit with a velvet jacket and tam; an embroidered peasant blouse worn with a full red skirt and black laced bodice. I had worn these clothes with docility, even pleasure, in the days when I was unaware of the 
+world’s opinion. Now, grown wiser, I wished for dresses like those my friend Lonnie had, bought at Beale’s store.
+
+I had to try it on. Sometimes Lonnie came home from school with me and she would sit on the couch watching. I was embarrassed by the way my mother crept around me, her knees creaking, her breath coming heavily. She muttered to herself. Around the house she wore 
+no corset or stockings, she wore wedge-heeled shoes and ankle socks; her legs were marked with lumps of blue-green veins. I thought her squatting position shameless, even obscene; I tried to keep talking to Lonnie so that her attention would be taken away from my mother 
+as much as possible. Lonnie wore the composed, polite, appreciative expression that was her disguise in the presence of grownups. She laughed at them and was a ferocious mimic, 
+and they never knew. My mother pulled me about, and pricked me with pins. She made me turn around, she made me walk away, she made me stand still. “What do you think of it, Lonnie?” she said around the pins in her mouth.
+“It’s beautiful,” said Lonnie, in her mild, sincere way. Lonnie’s own mother was dead. She lived with her father who never noticed her, and this, in my eyes, made her seem both 
 vulnerable and privileged.
 “It will be, if I can ever manage the fit,” my mother said. “Ah, well,” she said theatrically, 
 getting to her feet with a woeful creaking and sighing, “I doubt if she appreciates it.” She 

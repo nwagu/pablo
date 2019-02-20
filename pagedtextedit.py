@@ -2,8 +2,8 @@ import sys
 
 from pagemetrics import PageMetrics
 from PySide2.QtWidgets import QTextEdit
-from PySide2.QtGui import QPainter, QPen, QFont
-from PySide2.QtCore import Qt, Slot, QSizeF, QMargins, QMarginsF, QRectF
+from PySide2.QtGui import QPainter, QPen, QFont, QColor
+from PySide2.QtCore import Qt, Slot, QSizeF, QMargins, QMarginsF, QRectF, Signal
 
 class PagedTextEdit(QTextEdit):
 
@@ -13,6 +13,9 @@ class PagedTextEdit(QTextEdit):
 	m_showPageNumbers  = True
 	m_pageNumbersAlignment = Qt.AlignTop | Qt.AlignRight
 	m_pageMetrics = PageMetrics()
+
+	# Signals
+	pageInfo = Signal(tuple)
 
 	def __init__(self, *widget):
 		super(PagedTextEdit, self).__init__()
@@ -24,6 +27,11 @@ class PagedTextEdit(QTextEdit):
 
 		# Manual adjustment of the scroll interval
 		self.verticalScrollBar().rangeChanged.connect(self.aboutVerticalScrollRangeChanged)
+
+	def goToPage(self, pageNumber):
+		pageHeight = self.m_pageMetrics.pxPageSize().height()
+		value = (pageNumber - 1) * pageHeight
+		self.verticalScrollBar().setValue(value)
 
 	def setPageFormat(self, _pageFormat):
 		self.m_pageMetrics.update(_pageFormat)
@@ -88,7 +96,7 @@ class PagedTextEdit(QTextEdit):
 			pageHeight = self.m_pageMetrics.pxPageSize().height()
 
 			# Calculate indents for viewport
-			DEFAULT_TOP_MARGIN = 10
+			DEFAULT_TOP_MARGIN = 0
 			DEFAULT_BOTTOM_MARGIN = 0
 			leftMargin = 0
 			rightMargin = 0
@@ -147,7 +155,7 @@ class PagedTextEdit(QTextEdit):
 			pageHeight = self.m_pageMetrics.pxPageSize().height()
 
 			p = QPainter(self.viewport())
-			spacePen = QPen(self.palette().window(), 9)
+			spacePen = QPen(self.palette().window(), 4)
 			borderPen = QPen(self.palette().dark(), 1)
 
 			curHeight = pageHeight - (self.verticalScrollBar().value() % pageHeight)
@@ -162,18 +170,21 @@ class PagedTextEdit(QTextEdit):
 
 				# Draw the page break background
 				p.setPen(spacePen)
+				# Top
+				p.drawLine(0, curHeight - pageHeight, self.width(), curHeight - pageHeight)
+				# Bottom
 				p.drawLine(0, curHeight-4, self.width(), curHeight-4)
 				
 				# Draw the page borders
-				p.setPen(borderPen)
-				# top
-				p.drawLine(0, curHeight - pageHeight, x, curHeight - pageHeight)
-				# bottom
-				p.drawLine(0, curHeight-8, x, curHeight-8)
-				# left
-				p.drawLine(0 - horizontalDelta, curHeight - pageHeight, 0 - horizontalDelta, curHeight - 8)
-				# right
-				p.drawLine(x - horizontalDelta, curHeight - pageHeight, x - horizontalDelta, curHeight - 8)
+				# p.setPen(borderPen)
+				# # top
+				# p.drawLine(0, curHeight - pageHeight, x, curHeight - pageHeight)
+				# # bottom
+				# p.drawLine(0, curHeight-8, x, curHeight-8)
+				# # left
+				# p.drawLine(0 - horizontalDelta, curHeight - pageHeight, 0 - horizontalDelta, curHeight - 8)
+				# # right
+				# p.drawLine(x - horizontalDelta, curHeight - pageHeight, x - horizontalDelta, curHeight - 8)
 
 				# Go to next page
 				curHeight += pageHeight
@@ -216,6 +227,10 @@ class PagedTextEdit(QTextEdit):
 
 			# The number of the first page to see.
 			pageNumber = self.verticalScrollBar().value() / pageHeight + 1
+
+			# Add 0.3 to pageNumber before emitting 
+			# to announce page when it is about halfway up the screen
+			self.pageInfo.emit((int(pageNumber + 0.3), int(self.verticalScrollBar().maximum() / pageHeight + 1)))
 
 			# Paint page numbers while there are remotely more visible pages
 			while(curHeight < pageHeight + self.height()):
