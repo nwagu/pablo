@@ -1,0 +1,11 @@
+specify and implement default theme
+
+Design Icon and icons; splash image
+
+Implement collaborative editing
+
+Custom file extension
+
+Implement tags with which user can go to certain portions of the document
+
+create exe using pyinstaller and test run on several platforms

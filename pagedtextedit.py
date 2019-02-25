@@ -2,8 +2,8 @@ import sys
 
 from pagemetrics import PageMetrics
 from PySide2.QtWidgets import QTextEdit
-from PySide2.QtGui import QPainter, QPen, QFont, QColor
-from PySide2.QtCore import Qt, Slot, QSizeF, QMargins, QMarginsF, QRectF, Signal
+from PySide2.QtGui import QPainter, QPainterPath, QPen, QFont, QColor
+from PySide2.QtCore import Qt, Slot, QSizeF, QMargins, QMarginsF, QRect, QRectF, Signal
 
 class PagedTextEdit(QTextEdit):
 
@@ -23,7 +23,7 @@ class PagedTextEdit(QTextEdit):
 		
 		# Configuring document change checking
 		self.aboutDocumentChanged()
-		self.textChanged.connect(self.aboutDocumentChanged())
+		# self.textChanged.connect(self.aboutDocumentChanged())
 
 		# Manual adjustment of the scroll interval
 		self.verticalScrollBar().rangeChanged.connect(self.aboutVerticalScrollRangeChanged)
@@ -34,8 +34,8 @@ class PagedTextEdit(QTextEdit):
 		self.verticalScrollBar().setValue(value)
 
 	def setPageFormat(self, _pageFormat):
-		self.m_pageMetrics.update(_pageFormat)
-
+		self.m_pageMetrics.update(_pageFormat, self.m_pageMetrics.m_mmPageMargins)
+		
 		# Redraw ourselves
 		self.repaint()
 
@@ -96,7 +96,7 @@ class PagedTextEdit(QTextEdit):
 			pageHeight = self.m_pageMetrics.pxPageSize().height()
 
 			# Calculate indents for viewport
-			DEFAULT_TOP_MARGIN = 0
+			DEFAULT_TOP_MARGIN = 10
 			DEFAULT_BOTTOM_MARGIN = 0
 			leftMargin = 0
 			rightMargin = 0
@@ -121,7 +121,8 @@ class PagedTextEdit(QTextEdit):
 				bottomMargin = self.height() - documentHeight - HORIZONTAL_SCROLLBAR_HEIGHT - DEFAULT_TOP_MARGIN - BORDERS_HEIGHT
 
 			# Adjust the indents themselves
-			viewportMargins = QMargins(leftMargin, topMargin, rightMargin, bottomMargin)
+			# rightMargin minus 200 to give space for user notes
+			viewportMargins = QMargins(leftMargin, topMargin, rightMargin - 200, bottomMargin)
 		
 
 		self.setViewportMargins(viewportMargins)
@@ -155,12 +156,9 @@ class PagedTextEdit(QTextEdit):
 			pageHeight = self.m_pageMetrics.pxPageSize().height()
 
 			p = QPainter(self.viewport())
-			spacePen = QPen(self.palette().window(), 4)
 			borderPen = QPen(self.palette().dark(), 1)
 
 			curHeight = pageHeight - (self.verticalScrollBar().value() % pageHeight)
-			# Adjust the position of the right border
-			x = pageWidth + (2 if (self.width() % 2 == 0) else 1)
 
 			# Horizontal offset if there is a scroll bar
 			horizontalDelta = self.horizontalScrollBar().value()
@@ -168,37 +166,19 @@ class PagedTextEdit(QTextEdit):
 			# Paint page views while there are remotely more visible pages
 			while (curHeight < pageHeight + self.height()):
 
-				# Draw the page break background
-				p.setPen(spacePen)
-				# Top
-				p.drawLine(0, curHeight - pageHeight, self.width(), curHeight - pageHeight)
-				# Bottom
-				p.drawLine(0, curHeight-4, self.width(), curHeight-4)
+				p.setRenderHint(QPainter.Antialiasing);
+				path = QPainterPath()
+				# In painting page, height of the rect is pageHeight - 10
+				# to give page break
+				pageLayout = QRectF(0 - horizontalDelta, curHeight - pageHeight, pageWidth, pageHeight - 10)
+				path.addRect(pageLayout)
+				p.fillPath(path, Qt.white)
 				
-				# Draw the page borders
-				# p.setPen(borderPen)
-				# # top
-				# p.drawLine(0, curHeight - pageHeight, x, curHeight - pageHeight)
-				# # bottom
-				# p.drawLine(0, curHeight-8, x, curHeight-8)
-				# # left
-				# p.drawLine(0 - horizontalDelta, curHeight - pageHeight, 0 - horizontalDelta, curHeight - 8)
-				# # right
-				# p.drawLine(x - horizontalDelta, curHeight - pageHeight, x - horizontalDelta, curHeight - 8)
-
+				p.setPen(borderPen);
+				p.drawPath(path)
+				
 				# Go to next page
 				curHeight += pageHeight
-			
-
-			# Draw the side borders of the page when the page does not fit into the screen
-			if (curHeight >= self.height()):
-				# Page borders
-				p.setPen(borderPen)
-				# ... left
-				p.drawLine(0 - horizontalDelta, curHeight-pageHeight, 0 - horizontalDelta, self.height())
-				# ... right
-				p.drawLine(x - horizontalDelta, curHeight-pageHeight, x - horizontalDelta, self.height())
-		
 
 	def paintPageNumbers(self):
 		# Page numbers are drawn only when the editor is in page mode,

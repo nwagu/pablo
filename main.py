@@ -1,24 +1,32 @@
 import sys
 
-# from pabloview import PabloView
+import struct
+import numpy as np
+import scipy
+import scipy.misc
+import scipy.cluster
 from pagedtextedit import PagedTextEdit
 from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
+from PIL import Image
 
 main_windows = []
+m_theme = "themes/7.jpg"
 
-def create_main_window():
+def create_main_window(): # TODO this function should require a theme attribute
     """Creates a MainWindow."""
     main_win = MainWindow()
+    main_win._setup_components()
+    main_win.setTheme(m_theme)
     main_windows.append(main_win)
     main_win.show()
     return main_win
 
 class MainWindow(QMainWindow):
-    """Provides the parent window that includes the BookmarkWidget,
-    BrowserTabWidget, and a DownloadWidget, to offer the complete
-    web browsing experience."""
+    """Contains a menubar, statusbar
+    also contains a QWidget, container, as central widget
+    container contains the PagedTextEdit. """
     def __init__(self, fileName=None):
         super(MainWindow, self).__init__()
 
@@ -31,38 +39,49 @@ class MainWindow(QMainWindow):
         self.setWindowState(Qt.WindowMaximized)
         available_geometry = app.desktop().availableGeometry(self)
         self.resize(available_geometry.width(), available_geometry.height())
+        self.readSettings()
+
+        self.container = QWidget()
 
         self.paged_text_edit = PagedTextEdit()
-
-        bkgnd = QPixmap("images/bkg1.jpg")
-        bkgnd = bkgnd.scaled(self.size(), Qt.KeepAspectRatioByExpanding)
-        palette = QPalette()
-        palette.setBrush(QPalette.Window, bkgnd)
-        self.paged_text_edit.setPalette(palette)
-        # self.paged_text_edit.setBackgroundVisible(True)
-        self.paged_text_edit.setAutoFillBackground(True)
+        # The textedit must be transparent; the white pages are painted in paintEvent() function
+        self.paged_text_edit.setStyleSheet("QTextEdit { background-color: rgb(255, 255, 255, 0) }")
 
         doc = QTextDocument()
         font = QFont()
-        font.setPointSize(20)
+        font.setPointSize(12)
         font.setFamily('Calibri')
         doc.setDefaultFont(font)
         self.paged_text_edit.setDocument(doc)
-        self.paged_text_edit.setPageFormat(QPageSize.A5);
-        self.paged_text_edit.setPageMargins(QMarginsF(15, 15, 15, 15));
-        self.paged_text_edit.setUsePageMode(True);
-        self.paged_text_edit.setAddSpaceToBottom(False) # not needed in paged mode
-        self.paged_text_edit.setPageNumbersAlignment(Qt.AlignBottom | Qt.AlignCenter);
+        self.paged_text_edit.setPageFormat(QPageSize.A5Extra)
+        self.paged_text_edit.setPageMargins(QMarginsF(15, 15, 15, 15))
+        self.paged_text_edit.setUsePageMode(True)
+        self.paged_text_edit.setPageNumbersAlignment(Qt.AlignBottom | Qt.AlignCenter)
 
-        self.setCentralWidget(self.paged_text_edit)
+        # This below block of code prevents undoing the setDocumentMargin() and setFrameformat()
+        # methods in the aboutUpdateDocumentGeometry function
+        self.paged_text_edit.aboutUpdateDocumentGeometry()
+        # self.paged_text_edit.document().clearUndoRedoStack() # This does not work
+        # These commands work
+        self.paged_text_edit.document().setUndoRedoEnabled(False)
+        self.paged_text_edit.document().setUndoRedoEnabled(True)
+
+        self.layout = QHBoxLayout()
+        self.layout.addWidget(self.paged_text_edit)
+        self.layout.setMargin(0)
+        self.container.setLayout(self.layout)
+        self.setCentralWidget(self.container)
 
         self.setCurrentFile('')
         # self.filters = "Text files (*.txt)"
+        self.paged_text_edit.document().contentsChanged.connect(self.documentWasModified)
+        
+
 
     def _setup_components(self):
         self._create_menus()
         self._create_actions()
-        self._create_tool_bar()
+        # self._create_tool_bar()
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)
         self.printMessageOnStatus("Ready", 10000)
@@ -84,18 +103,19 @@ class MainWindow(QMainWindow):
         self.edit_menu.addSeparator()
         self.edit_menu.addAction(self.select_all_action)
         
+        self.themes_menu.addAction(self.themes_action)
         self.about_menu.addAction(self.about_action)
 
-        self.main_tool_bar.addAction(self.new_action)
-        self.main_tool_bar.addAction(self.open_action)
-        self.main_tool_bar.addAction(self.save_action)
-        self.main_tool_bar.addSeparator()
-        self.main_tool_bar.addAction(self.cut_action)
-        self.main_tool_bar.addAction(self.copy_action)
-        self.main_tool_bar.addAction(self.paste_action)
-        self.main_tool_bar.addSeparator()
-        self.main_tool_bar.addAction(self.undo_action)
-        self.main_tool_bar.addAction(self.redo_action)
+        # self.main_tool_bar.addAction(self.new_action)
+        # self.main_tool_bar.addAction(self.open_action)
+        # self.main_tool_bar.addAction(self.save_action)
+        # self.main_tool_bar.addSeparator()
+        # self.main_tool_bar.addAction(self.cut_action)
+        # self.main_tool_bar.addAction(self.copy_action)
+        # self.main_tool_bar.addAction(self.paste_action)
+        # self.main_tool_bar.addSeparator()
+        # self.main_tool_bar.addAction(self.undo_action)
+        # self.main_tool_bar.addAction(self.redo_action)
 
     def _create_actions(self):
         self.new_action  = QAction(QIcon('images/new.png'), "&New", self, shortcut=QKeySequence.New, 
@@ -114,7 +134,8 @@ class MainWindow(QMainWindow):
         self.select_all_action = QAction(QIcon('images/selectAll.png'), "Select All", self, statusTip="Select All", triggered=self.paged_text_edit.selectAll)
         self.redo_action = QAction(QIcon('images/redo.png'),"Redo", self, shortcut=QKeySequence.Redo, statusTip="Redo previous action", triggered=self.paged_text_edit.redo)
         self.undo_action = QAction(QIcon('images/undo.png'),"Undo", self, shortcut=QKeySequence.Undo, statusTip="Undo previous action", triggered=self.paged_text_edit.undo)
-        self.font_action = QAction('F&ont', self, statusTip = "Modify font properties", triggered = self.fontChange)
+        self.themes_action = QAction(QIcon('images/save.png'), "&Themes...", self, statusTip = "Themes", triggered = self.fontChange)
+        self.font_action = QAction("F&ont", self, statusTip = "Modify font properties", triggered = self.fontChange)
         self.about_action = QAction(QIcon('images/about.png'), 'A&bout', self,
                                 shortcut = QKeySequence(QKeySequence.HelpContents), triggered=self.about_pablo)
 
@@ -131,6 +152,7 @@ class MainWindow(QMainWindow):
     def _create_menus(self):
         self.file_menu = self.menuBar().addMenu("&File")
         self.edit_menu = self.menuBar().addMenu("&Edit")
+        self.themes_menu = self.menuBar().addMenu("&Themes")
         self.about_menu = self.menuBar().addMenu("&About")
 
     def newFile(self):
@@ -187,7 +209,7 @@ class MainWindow(QMainWindow):
         QApplication.restoreOverrideCursor()
 
         self.setCurrentFile(fileName)
-        self.statusBar().showMessage("File saved", 2000)
+        self.statusBar.showMessage("File saved", 2000)
         return True
 
     def maybeSave(self):
@@ -242,6 +264,9 @@ class MainWindow(QMainWindow):
         settings.setValue("pos", self.pos())
         settings.setValue("size", self.size())
 
+    def documentWasModified(self):
+        self.setWindowModified(self.paged_text_edit.document().isModified())
+
     def about_pablo(self):
         QMessageBox.about(self, "About Pablo",
                 "<b>Pablo</b> is a collaborative platform for writers."
@@ -256,15 +281,35 @@ class MainWindow(QMainWindow):
     def printMessageOnStatus(self, message, timeout=5000):                                                   
         self.statusBar.showMessage(message, timeout)
 
+    def setTheme(self, themePath):
+        self.container.setStyleSheet(".QWidget { border-image: url(" + themePath + ");}");
+        NUM_CLUSTERS = 5
+        im = Image.open(themePath)
+        im = im.resize((150, 150))  # optional, to reduce time
+        ar = np.asarray(im)
+        shape = ar.shape
+        ar = ar.reshape(scipy.product(shape[:2]), shape[2]).astype(float)
+
+        codes, dist = scipy.cluster.vq.kmeans(ar, NUM_CLUSTERS)
+
+        vecs, dist = scipy.cluster.vq.vq(ar, codes)         # assign codes
+        counts, bins = scipy.histogram(vecs, len(codes))    # count occurrences
+
+        index_max = scipy.argmax(counts)                    # find most frequent
+        peak = codes[index_max]
+        colour_hex = '#%02x%02x%02x' % tuple(int(i) for i in peak)
+
+        self.setStyleSheet("QMainWindow { background-color: " + colour_hex + " }");
+        self.statusBar.setStyleSheet("QStatusBar { background-color: " + colour_hex + "; border: none;}")
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     pixmap = QPixmap("images/splash.png")
     splash = QSplashScreen(pixmap)
-    splash.show()
+    # splash.show()
     app.processEvents()
 
     main_win = create_main_window()
-    main_win._setup_components()
     exit_code = app.exec_()
     sys.exit(exit_code)
