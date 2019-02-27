@@ -12,7 +12,7 @@ from PySide2.QtWidgets import *
 from PIL import Image
 
 main_windows = []
-m_theme = "themes/7.jpg"
+m_theme = "themes/3.jpg"
 
 def create_main_window(): # TODO this function should require a theme attribute
     """Creates a MainWindow."""
@@ -34,7 +34,7 @@ class MainWindow(QMainWindow):
         self.curPage = (0, 0) # Tuple containing current page and total pages of the current file
 
         self.setWindowTitle('Pablo Editor')
-        self.setWindowIcon(QIcon('images/icon.png'))
+        self.setWindowIcon(QIcon('images/recycle.png'))
         self.setWindowState(Qt.WindowFullScreen)
         self.setWindowState(Qt.WindowMaximized)
         available_geometry = app.desktop().availableGeometry(self)
@@ -43,9 +43,11 @@ class MainWindow(QMainWindow):
 
         self.container = QWidget()
 
-        self.paged_text_edit = PagedTextEdit()
+        self.paged_text_edit = PagedTextEdit(self.container)
         # The textedit must be transparent; the white pages are painted in paintEvent() function
-        self.paged_text_edit.setStyleSheet("QTextEdit { background-color: rgb(255, 255, 255, 0) }")
+        self.paged_text_edit.setStyleSheet("QTextEdit { background-color: transparent }")
+
+        self.paged_text_edit.setFrameStyle(QFrame.NoFrame) # Removes a border-like line around the TextEdit
 
         doc = QTextDocument()
         font = QFont()
@@ -57,6 +59,21 @@ class MainWindow(QMainWindow):
         self.paged_text_edit.setPageMargins(QMarginsF(15, 15, 15, 15))
         self.paged_text_edit.setUsePageMode(True)
         self.paged_text_edit.setPageNumbersAlignment(Qt.AlignBottom | Qt.AlignCenter)
+
+        self.nav_bar = QScrollArea()
+        self.nav_bar.setFixedWidth(200)
+        sizePolicy = QSizePolicy()
+        sizePolicy.setVerticalPolicy(QSizePolicy.Expanding)
+        sizePolicy.setHorizontalPolicy(QSizePolicy.Maximum)
+        self.nav_bar.setSizePolicy(sizePolicy)
+        self.nav_bar.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.nav_bar.setVisible(False)
+        self.text_edit_layout = QHBoxLayout()
+        self.text_edit_layout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+        self.text_edit_layout.addWidget(self.nav_bar)
+        self.text_edit_layout.setMargin(0)
+        self.paged_text_edit.setLayout(self.text_edit_layout)
+        self.nav_bar.setStyleSheet("QScrollArea { background-color: transparent; border: 1px solid black;}");
 
         # This below block of code prevents undoing the setDocumentMargin() and setFrameformat()
         # methods in the aboutUpdateDocumentGeometry function
@@ -75,14 +92,12 @@ class MainWindow(QMainWindow):
         self.setCurrentFile('')
         # self.filters = "Text files (*.txt)"
         self.paged_text_edit.document().contentsChanged.connect(self.documentWasModified)
-        
-
 
     def _setup_components(self):
         self._create_menus()
         self._create_actions()
-        # self._create_tool_bar()
-        self.statusBar = QStatusBar()
+        self._create_tool_bar()
+        self._create_status_bar()
         self.setStatusBar(self.statusBar)
         self.printMessageOnStatus("Ready", 10000)
         self.paged_text_edit.pageInfo.connect(self.readPageInfo)
@@ -106,28 +121,18 @@ class MainWindow(QMainWindow):
         self.themes_menu.addAction(self.themes_action)
         self.about_menu.addAction(self.about_action)
 
-        # self.main_tool_bar.addAction(self.new_action)
-        # self.main_tool_bar.addAction(self.open_action)
-        # self.main_tool_bar.addAction(self.save_action)
-        # self.main_tool_bar.addSeparator()
-        # self.main_tool_bar.addAction(self.cut_action)
-        # self.main_tool_bar.addAction(self.copy_action)
-        # self.main_tool_bar.addAction(self.paste_action)
-        # self.main_tool_bar.addSeparator()
-        # self.main_tool_bar.addAction(self.undo_action)
-        # self.main_tool_bar.addAction(self.redo_action)
+        self.main_tool_bar.addAction(self.first_action)
+        self.main_tool_bar.addAction(self.second_action)
+        self.main_tool_bar.addAction(self.third_action)
+        self.main_tool_bar.addAction(self.fourth_action)
+        self.main_tool_bar.addAction(self.fifth_action)
 
     def _create_actions(self):
-        self.new_action  = QAction(QIcon('images/new.png'), "&New", self, shortcut=QKeySequence.New, 
-                        statusTip="Create a New File", triggered=self.newFile)
-        self.open_action = QAction(QIcon('images/open.png'), "O&pen", self, shortcut=QKeySequence.Open, 
-                        statusTip="Open an existing file", triggered=self.open)
-        self.save_action = QAction(QIcon('images/save.png'), "&Save", self, shortcut=QKeySequence.Save, 
-                        statusTip="Save the current file to disk", triggered=self.save)
-        self.save_as_action = QAction(QIcon('images/save.png'), "Save &As...", self, shortcut=QKeySequence.SaveAs, 
-                        statusTip="Save the current file under a new name", triggered=self.saveAs)
-        self.exit_action = QAction(QIcon.fromTheme("application-exit"), "E&xit", self, shortcut="Ctrl+Q", 
-                        statusTip="Exit the Application", triggered=self.close)
+        self.new_action  = QAction(QIcon('images/new.png'), "&New", self, shortcut=QKeySequence.New, statusTip="Create a New File", triggered=self.newFile)
+        self.open_action = QAction(QIcon('images/open.png'), "O&pen", self, shortcut=QKeySequence.Open, statusTip="Open an existing file", triggered=self.open)
+        self.save_action = QAction(QIcon('images/save.png'), "&Save", self, shortcut=QKeySequence.Save, statusTip="Save the current file to disk", triggered=self.save)
+        self.save_as_action = QAction(QIcon('images/save.png'), "Save &As...", self, shortcut=QKeySequence.SaveAs, statusTip="Save the current file under a new name", triggered=self.saveAs)
+        self.exit_action = QAction(QIcon.fromTheme("application-exit"), "E&xit", self, shortcut="Ctrl+Q", statusTip="Exit the Application", triggered=self.close)
         self.cut_action = QAction(QIcon('images/cut.png'), "C&ut", self, shortcut=QKeySequence.Cut, statusTip="Cut the current selection to clipboard", triggered=self.paged_text_edit.cut)
         self.copy_action = QAction(QIcon('images/copy.png'), "C&opy", self, shortcut=QKeySequence.Copy, statusTip="Copy the current selection to clipboard", triggered=self.paged_text_edit.copy)
         self.paste_action = QAction(QIcon('images/paste.png'), "&Paste", self, shortcut=QKeySequence.Paste, statusTip="Paste the clipboard's content in current location", triggered=self.paged_text_edit.paste)
@@ -136,24 +141,41 @@ class MainWindow(QMainWindow):
         self.undo_action = QAction(QIcon('images/undo.png'),"Undo", self, shortcut=QKeySequence.Undo, statusTip="Undo previous action", triggered=self.paged_text_edit.undo)
         self.themes_action = QAction(QIcon('images/save.png'), "&Themes...", self, statusTip = "Themes", triggered = self.fontChange)
         self.font_action = QAction("F&ont", self, statusTip = "Modify font properties", triggered = self.fontChange)
-        self.about_action = QAction(QIcon('images/about.png'), 'A&bout', self,
-                                shortcut = QKeySequence(QKeySequence.HelpContents), triggered=self.about_pablo)
+        self.about_action = QAction(QIcon('images/about.png'), 'A&bout', self, shortcut = QKeySequence(QKeySequence.HelpContents), triggered=self.about_pablo)
 
+        # Side toolbar actions...
+        self.first_action = QAction(QIcon('images/folder.png'), "&Side1", self, statusTip = "ph", triggered=self.toggleNavigationBar)
+        self.second_action = QAction(QIcon('images/music.png'), "&Side2", self, statusTip = "ph", triggered=self.toggleNavigationBar)
+        self.third_action = QAction(QIcon('images/pictures.png'), "&Side3", self, statusTip = "ph", triggered=self.toggleNavigationBar)
+        self.fourth_action = QAction(QIcon('images/videos.png'), "&Side4", self, statusTip = "ph", triggered=self.toggleNavigationBar)
+        self.fifth_action = QAction(QIcon('images/theme.png'), "&Side5", self, statusTip = "ph", triggered=self.toggleNavigationBar)
+        
         self.cut_action.setEnabled(False)
         self.copy_action.setEnabled(False)
+        self.undo_action.setEnabled(False)
+        self.redo_action.setEnabled(False)
         self.paged_text_edit.copyAvailable.connect(self.cut_action.setEnabled)
         self.paged_text_edit.copyAvailable.connect(self.copy_action.setEnabled)
+        self.paged_text_edit.undoAvailable.connect(self.undo_action.setEnabled)
+        self.paged_text_edit.redoAvailable.connect(self.redo_action.setEnabled)
 
     def _create_tool_bar(self):
-        self.main_tool_bar = self.addToolBar('Main')
+        self.main_tool_bar = QToolBar()
+        self.addToolBar(Qt.LeftToolBarArea, self.main_tool_bar)
         self.main_tool_bar.setMovable(False)
-        self.main_tool_bar.setStyleSheet("QToolBar { background: rgb(0, 0, 0, 0); border: none;}")
+        self.main_tool_bar.setIconSize(QSize(30, 30));
+        self.main_tool_bar.setFixedWidth(45);
 
     def _create_menus(self):
         self.file_menu = self.menuBar().addMenu("&File")
         self.edit_menu = self.menuBar().addMenu("&Edit")
         self.themes_menu = self.menuBar().addMenu("&Themes")
         self.about_menu = self.menuBar().addMenu("&About")
+
+    def _create_status_bar(self):
+        self.statusBar = QStatusBar()
+        self.pageInfoStatusLabel = QLabel()
+        self.statusBar.addPermanentWidget(self.pageInfoStatusLabel)
 
     def newFile(self):
         if self.maybeSave():
@@ -276,13 +298,19 @@ class MainWindow(QMainWindow):
     @Slot(tuple)
     def readPageInfo(self, pageInfo):
         self.curPage = pageInfo
-        self.printMessageOnStatus("Page " + str(pageInfo[0]) + " of " + str(pageInfo[1]))
+        pageMessage = str(pageInfo[0]) + " / " + str(pageInfo[1]) + "    "
+        self.pageInfoStatusLabel.setText(pageMessage)
 
     def printMessageOnStatus(self, message, timeout=5000):                                                   
         self.statusBar.showMessage(message, timeout)
 
+    def toggleNavigationBar(self):
+        self.nav_bar.setVisible(not self.nav_bar.isVisible())
+
     def setTheme(self, themePath):
         self.container.setStyleSheet(".QWidget { border-image: url(" + themePath + ");}");
+
+        # Get the dominant colour from the theme image
         NUM_CLUSTERS = 5
         im = Image.open(themePath)
         im = im.resize((150, 150))  # optional, to reduce time
@@ -300,14 +328,16 @@ class MainWindow(QMainWindow):
         colour_hex = '#%02x%02x%02x' % tuple(int(i) for i in peak)
 
         self.setStyleSheet("QMainWindow { background-color: " + colour_hex + " }");
-        self.statusBar.setStyleSheet("QStatusBar { background-color: " + colour_hex + "; border: none;}")
+        self.main_tool_bar.setStyleSheet(".QToolBar { background-color: transparent; border: none; } .QToolButton { margin-bottom: 10px; margin-top: 10px; } ")
+        self.pageInfoStatusLabel.setStyleSheet(".QLabel { color: white; font-weight: 800; }")
+        self.statusBar.setStyleSheet(".QStatusBar { background-color: transparent; border: none; color: white;}")
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     pixmap = QPixmap("images/splash.png")
     splash = QSplashScreen(pixmap)
-    # splash.show()
+    splash.show()
     app.processEvents()
 
     main_win = create_main_window()
