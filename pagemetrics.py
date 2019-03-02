@@ -1,4 +1,3 @@
-import sys
 
 from PySide2.QtGui import QPageSize
 from PySide2.QtCore import QSizeF, QMarginsF

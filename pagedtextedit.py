@@ -1,4 +1,3 @@
-import sys
 
 from pagemetrics import PageMetrics
 from PySide2.QtWidgets import QTextEdit
@@ -96,17 +95,16 @@ class PagedTextEdit(QTextEdit):
 			pageHeight = self.m_pageMetrics.pxPageSize().height()
 
 			# Calculate indents for viewport
-			DEFAULT_TOP_MARGIN = 10
+			DEFAULT_TOP_MARGIN = 0
 			DEFAULT_BOTTOM_MARGIN = 0
 			leftMargin = 0
 			rightMargin = 0
 
 			# If the width of the editor is greater than the width of the page of the document, expand the side margins.
 			if (self.width() > pageWidth):
-				BORDERS_WIDTH = 4
 				VERTICAL_SCROLLBAR_WIDTH = self.verticalScrollBar().width() if self.verticalScrollBar().isVisible() else 0
 				# ... the width of the viewport frame and the editor itself
-				leftMargin = rightMargin = (self.width() - pageWidth - VERTICAL_SCROLLBAR_WIDTH - BORDERS_WIDTH) / 2
+				leftMargin = rightMargin = (self.width() - pageWidth - VERTICAL_SCROLLBAR_WIDTH) / 2
 			
 
 			topMargin = DEFAULT_TOP_MARGIN
@@ -116,13 +114,12 @@ class PagedTextEdit(QTextEdit):
 			bottomMargin = DEFAULT_BOTTOM_MARGIN
 			documentHeight = pageHeight * self.document().pageCount()
 			if ((self.height() - documentHeight) > (DEFAULT_TOP_MARGIN + DEFAULT_BOTTOM_MARGIN)):
-				BORDERS_HEIGHT = 2
 				HORIZONTAL_SCROLLBAR_HEIGHT = self.horizontalScrollBar().height() if self.horizontalScrollBar().isVisible() else 0
-				bottomMargin = self.height() - documentHeight - HORIZONTAL_SCROLLBAR_HEIGHT - DEFAULT_TOP_MARGIN - BORDERS_HEIGHT
+				bottomMargin = self.height() - documentHeight - HORIZONTAL_SCROLLBAR_HEIGHT - DEFAULT_TOP_MARGIN
 
 			# Adjust the indents themselves
 			# rightMargin minus 200 to give space for user notes
-			viewportMargins = QMargins(leftMargin, topMargin, rightMargin - 200, bottomMargin)
+			viewportMargins = QMargins(leftMargin, topMargin, rightMargin, bottomMargin)
 		
 
 		self.setViewportMargins(viewportMargins)
@@ -168,7 +165,7 @@ class PagedTextEdit(QTextEdit):
 
 				p.setRenderHint(QPainter.Antialiasing);
 				path = QPainterPath()
-				# In painting page, height of the rect is pageHeight - 10
+				# In painting page, height of the rect is (pageHeight - 10)
 				# to give page break
 				pageLayout = QRectF(0 - horizontalDelta, curHeight - pageHeight, pageWidth, pageHeight - 10)
 				path.addRect(pageLayout)
