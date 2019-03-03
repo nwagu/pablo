@@ -36,12 +36,19 @@ class NavBar(QScrollArea):
 		self.setSizePolicy(sizePolicy)
 		self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-		self.vLayout = QVBoxLayout(self)
-		self.setLayout(self.vLayout)
+
+		self.wid = QWidget()
+		self.wid.setStyleSheet(".QWidget {background-color: transparent; border: none;}")
+		self.vLayout = QVBoxLayout(self.wid)
+		self.vLayout.setAlignment(Qt.AlignTop | Qt.AlignCenter)
+		self.vLayout.setMargin(0)
+		self.setWidgetResizable(True)
+		self.setWidget(self.wid)
+		self.wid.setLayout(self.vLayout)
 		
 	def addComponent(self, component):
 		self.vLayout.addWidget(component)
-		
+
 	def clearNavBar(self):
 		pass # remove all widgets
 		
@@ -201,11 +208,11 @@ class MainWindow(QMainWindow):
 		self.font_action = QAction("F&ont", self, statusTip = "Modify font properties", triggered = self.fontChange)
 		
 		self.bold_action = QAction(QIcon('images/bold.png'),"Bold", self, checkable=True, 
-				shortcut=QKeySequence.Bold, triggered=self.handleFontChange)
+				shortcut=QKeySequence.Bold, triggered=self.bold)
 		self.italic_action = QAction(QIcon('images/italic.png'), "Italic", self, checkable=True, 
-				shortcut=QKeySequence.Italic, triggered=self.handleFontChange)
+				shortcut=QKeySequence.Italic, triggered=self.italic)
 		self.underline_action = QAction(QIcon('images/underline.png'), "Underline", self, checkable=True, 
-				shortcut=QKeySequence.Underline, triggered=self.handleFontChange)
+				shortcut=QKeySequence.Underline, triggered=self.underline)
 
 		self.about_action = QAction(QIcon('images/about.png'), 'A&bout', self, shortcut = QKeySequence(QKeySequence.HelpContents), triggered=self.about_pablo)
 
@@ -376,27 +383,31 @@ class MainWindow(QMainWindow):
 		settings = QSettings("Trolltech", "Application Example")
 		settings.setValue("pos", self.pos())
 		settings.setValue("size", self.size())
-
-	def handleFontChange(self):
-
+		
+	def bold(self):
 		format = QTextCharFormat()
-		format.setFont(self.fontCombo.currentFont())
-		format.setFontPointSize(int(self.fontSizeCombo.currentText()))
-		if self.bold_action.isChecked():
-			format.setFontWeight(QFont.Bold)
-		else:
-			format.setFontWeight(QFont.Normal)
-		format.setFontItalic(self.italic_action.isChecked())
-		format.setFontUnderline(self.underline_action.isChecked())
-
+		format.setFontWeight(QFont.Bold if self.bold_action.isChecked() else QFont.Normal)
 		self.paged_text_edit.mergeCurrentCharFormat(format)
 		
+	def italic(self):
+		format = QTextCharFormat()
+		format.setFontItalic(self.italic_action.isChecked())
+		self.paged_text_edit.mergeCurrentCharFormat(format)
+		
+	def underline(self):
+		format = QTextCharFormat()
+		format.setFontUnderline(self.underline_action.isChecked())
+		self.paged_text_edit.mergeCurrentCharFormat(format)
+		
+	def currentFontChanged(self):
+		format = QTextCharFormat()
+		format.setFont(self.fontCombo.currentFont())
+		self.paged_text_edit.mergeCurrentCharFormat(format)
 
-	def currentFontChanged(self, font):
-		self.handleFontChange()
-
-	def fontSizeChanged(self, font):
-		self.handleFontChange()
+	def fontSizeChanged(self):
+		format = QTextCharFormat()
+		format.setFontPointSize(int(self.fontSizeCombo.currentText()))
+		self.paged_text_edit.mergeCurrentCharFormat(format)
 
 	def pageScaleChanged(self, scale):
 		pass
@@ -448,7 +459,8 @@ class MainWindow(QMainWindow):
 		self.nav_bar.setVisible(not self.nav_bar.isVisible())
 
 	def setTheme(self, themePath):
-		self.container.setStyleSheet(".QWidget { border-image: url(" + themePath + ");}");
+		self.container.setObjectName("ThemeContainer")
+		self.container.setStyleSheet("QWidget#ThemeContainer { border-image: url(" + themePath + ");}");
 
 		# Get the dominant colour from the theme image
 		NUM_CLUSTERS = 5
