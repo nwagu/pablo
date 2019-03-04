@@ -22,7 +22,6 @@ def create_main_window(): # TODO this function should require a theme attribute
 	"""Creates a MainWindow."""
 	main_win = MainWindow()
 	main_win._setup_components()
-	main_win.setup_nav_bar()
 	main_win.setTheme(m_theme)
 	main_windows.append(main_win)
 	main_win.show()
@@ -50,11 +49,15 @@ class NavBar(QScrollArea):
 		self.setWidget(self.wid)
 		self.wid.setLayout(self.vLayout)
 		
+		
 	def addComponent(self, component):
 		self.vLayout.addWidget(component)
+		component.setObjectName("barComp")
+		component.setStyleSheet("QWidget#barComp { margin-bottom: 20px; margin-top: 20px }")
 
 	def clearNavBar(self):
-		pass # remove all widgets
+		while(self.vLayout.count() != 0):
+			self.vLayout.takeAt(0).widget().setParent(None)
 		
 
 class MainWindow(QMainWindow):
@@ -106,7 +109,7 @@ class MainWindow(QMainWindow):
 		# This below block of code prevents undoing the setDocumentMargin() and setFrameformat()
 		# methods in the aboutUpdateDocumentGeometry function
 		self.paged_text_edit.aboutUpdateDocumentGeometry()
-		# self.paged_text_edit.document().clearUndoRedoStack() # This does not work
+		# self.paged_text_edit.document().clearUndoRedoStack() # this does not work
 		# These commands work
 		self.paged_text_edit.document().setUndoRedoEnabled(False)
 		self.paged_text_edit.document().setUndoRedoEnabled(True)
@@ -127,6 +130,8 @@ class MainWindow(QMainWindow):
 		self._create_actions()
 		self._create_tool_bar()
 		self._create_status_bar()
+		self._create_nav_widgets()
+
 		self.setStatusBar(self.statusBar)
 		self.printMessageOnStatus("Ready", 10000)
 		self.paged_text_edit.pageInfo.connect(self.readPageInfo)
@@ -152,16 +157,29 @@ class MainWindow(QMainWindow):
 		self.themes_menu.addAction(self.themes_action)
 		self.about_menu.addAction(self.about_action)
 
-		self.main_tool_bar.addAction(self.first_action)
-		self.main_tool_bar.addAction(self.second_action)
-		self.main_tool_bar.addAction(self.third_action)
-		self.main_tool_bar.addAction(self.fourth_action)
-		self.main_tool_bar.addAction(self.fifth_action)
+		self.main_tool_bar.addAction(self.main_format_action)
+		self.main_tool_bar.addAction(self.main_sections_action)
+		self.main_tool_bar.addAction(self.main_themes_action)
 
-	def setup_nav_bar(self):
+	def formatNav(self):
+		self.nav_bar.clearNavBar()
+		self.nav_bar.addComponent(self.fontCombo)
+		self.nav_bar.addComponent(self.fontSizeCombo)
+		self.nav_bar.addComponent(self.fontColorToolButton)
+		self.nav_bar.addComponent(self.editBar)
+		self.nav_bar.addComponent(self.indentBar)
+
+	def sectionNav(self):
+		self.nav_bar.clearNavBar()
+		self.nav_bar.addComponent(self.pageScaleCombo)
+
+	def themesNav(self):
+		self.nav_bar.clearNavBar()
+
+	def _create_nav_widgets(self):
 		self.fontCombo = QFontComboBox()
 		self.fontCombo.currentFontChanged.connect(self._fontFamily)
-		self.nav_bar.addComponent(self.fontCombo)
+		
 		
 		self.fontSizeCombo = QComboBox()
 		self.fontSizeCombo.setEditable(True)
@@ -170,43 +188,37 @@ class MainWindow(QMainWindow):
 		validator = QIntValidator(2, 64, self)
 		self.fontSizeCombo.setValidator(validator)
 		self.fontSizeCombo.currentIndexChanged.connect(self._fontSize)
-		self.nav_bar.addComponent(self.fontSizeCombo)
 		
 		self.fontColorToolButton = QToolButton()
 		self.fontColorToolButton.setPopupMode(QToolButton.MenuButtonPopup)
 		self.fontColorToolButton.setMenu(self.createColorMenu(self.textColorChanged, Qt.black))
 		# self.textAction = self.fontColorToolButton.menu().defaultAction()
 		self.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('images/textpointer.png', Qt.black))
-		self.fontColorToolButton.setAutoFillBackground(True)
 		# FIXME parameter is set to bool; get selected menu color and parse as argument
 		self.fontColorToolButton.clicked.connect(self.textButtonTriggered)
-		self.nav_bar.addComponent(self.fontColorToolButton)
 		
 		self.pageScaleCombo = QComboBox()
 		self.pageScaleCombo.addItems(["50%", "75%", "100%", "125%", "150%"])
 		self.pageScaleCombo.setCurrentIndex(2)
 		self.pageScaleCombo.currentIndexChanged[str].connect(self.pageScaleChanged)
-		self.nav_bar.addComponent(self.pageScaleCombo)
 
-		editBar = QWidget()
-		editLay = QHBoxLayout(editBar)
+		self.editBar = QWidget()
+		editLay = QHBoxLayout(self.editBar)
 		editLay.setSizeConstraint(QLayout.SetFixedSize)
 		for action in self.edit_actions:
 			button = QToolButton()
 			button.setDefaultAction(action)
 			editLay.addWidget(button)
-		editBar.setLayout(editLay)
-		self.nav_bar.addComponent(editBar)
+		self.editBar.setLayout(editLay)
 
-		indentBar = QWidget()
-		indentLay = QHBoxLayout(indentBar)
+		self.indentBar = QWidget()
+		indentLay = QHBoxLayout(self.indentBar)
 		indentLay.setSizeConstraint(QLayout.SetFixedSize)
 		for action in self.indent_actions:
 			button = QToolButton()
 			button.setDefaultAction(action)
 			indentLay.addWidget(button)
-		indentBar.setLayout(indentLay)
-		self.nav_bar.addComponent(indentBar)
+		self.indentBar.setLayout(indentLay)
 
 	def _create_actions(self):
 		self.new_action  = QAction(QIcon('images/new.png'), "&New", self, shortcut=QKeySequence.New, statusTip="Create a New File", triggered=self.newFile)
@@ -235,11 +247,9 @@ class MainWindow(QMainWindow):
 
 		
 		# Side toolbar actions...
-		self.first_action = QAction(QIcon('images/arrow.png'), "&Side1", self, statusTip = "ph", triggered=self.toggleNavigationBar)
-		self.second_action = QAction(QIcon('images/music.png'), "&Side2", self, statusTip = "ph", triggered=self.toggleNavigationBar)
-		self.third_action = QAction(QIcon('images/palm.png'), "&Side3", self, statusTip = "ph", triggered=self.toggleNavigationBar)
-		self.fourth_action = QAction(QIcon('images/sick.png'), "&Side4", self, statusTip = "ph", triggered=self.toggleNavigationBar)
-		self.fifth_action = QAction(QIcon('images/theme.png'), "&Side5", self, statusTip = "ph", triggered=self.toggleNavigationBar)
+		self.main_format_action = QAction(QIcon('images/arrow.png'), "&Format", self, statusTip = "Format", triggered=self.formatNav)
+		self.main_sections_action = QAction(QIcon('images/palm.png'), "&Sections", self, statusTip = "Sections", triggered=self.sectionNav)
+		self.main_themes_action = QAction(QIcon('images/theme.png'), "&Themes", self, statusTip = "Themes", triggered=self.themesNav)
 		
 		self.cut_action.setEnabled(False)
 		self.copy_action.setEnabled(False)
