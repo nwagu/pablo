@@ -228,10 +228,10 @@ class MainWindow(QMainWindow):
 		self.edit_actions = (QAction(QIcon('images/bold.png'), "Bold", self, checkable=True, shortcut=QKeySequence.Bold, triggered=self._bold),
 				QAction(QIcon('images/italic.png'), "Italic", self, checkable=True, shortcut=QKeySequence.Italic, triggered=self._italic),
 				QAction(QIcon('images/underline.png'), "Underline", self, checkable=True, shortcut=QKeySequence.Underline, triggered=self._underline))
-		self.indent_actions = (QAction(QIcon('images/undo.png'), "Left", self, checkable=True, statusTip="Left indent", triggered=self._indentLeft),
-				QAction(QIcon('images/undo.png'), "Right", self, checkable=True, statusTip="Right indent", triggered=self._indentRight),
-				QAction(QIcon('images/undo.png'), "Center", self, checkable=True, shortcut="Ctrl+E", statusTip="Center indent", triggered=self._indentCenter),
-				QAction(QIcon('images/undo.png'), "Justify", self, checkable=True, statusTip="Justify indent", triggered=self._indentJustify))
+		self.indent_actions = (QAction(QIcon('images/align-left.png'), "Left", self, checkable=True, statusTip="Left indent", triggered=self._indentLeft),
+				QAction(QIcon('images/align-right.png'), "Right", self, checkable=True, statusTip="Right indent", triggered=self._indentRight),
+				QAction(QIcon('images/align-center.png'), "Center", self, checkable=True, shortcut="Ctrl+E", statusTip="Center indent", triggered=self._indentCenter),
+				QAction(QIcon('images/align-justify.png'), "Justify", self, checkable=True, statusTip="Justify indent", triggered=self._indentJustify))
 
 		
 		# Side toolbar actions...
