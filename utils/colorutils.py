@@ -2,8 +2,8 @@
 from PySide2.QtGui import *
 from PySide2.QtCore import *
 
-class Utils:
-	"""This class contains utility functions """
+class ColorUtils:
+	"""This class contains utility functions for color. """
 
 	def createColorToolButtonIcon(imageFile, color):
 		pixmap = QPixmap(50, 80)

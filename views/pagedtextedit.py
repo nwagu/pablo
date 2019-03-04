@@ -1,5 +1,5 @@
 
-from pagemetrics import PageMetrics
+from views.pagemetrics import PageMetrics
 from PySide2.QtWidgets import QTextEdit
 from PySide2.QtGui import QPainter, QPainterPath, QPen, QFont, QColor
 from PySide2.QtCore import Qt, Slot, QSizeF, QMargins, QMarginsF, QRect, QRectF, Signal

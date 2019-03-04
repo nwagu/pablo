@@ -4,8 +4,10 @@ import numpy as np
 import scipy
 import scipy.misc
 import scipy.cluster
-from pagedtextedit import PagedTextEdit
-from utils import Utils
+
+from views.pagedtextedit import PagedTextEdit
+from utils.colorutils import ColorUtils
+
 from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
@@ -13,12 +15,14 @@ from PySide2.QtPrintSupport import QPrintDialog, QPrinter
 from PIL import Image
 
 main_windows = []
-m_theme = "themes/13.jpg"
+LEFT_INDENT = 1; RIGHT_INDENT = 2; CENTER_INDENT = 3; JUSTIFY_INDENT = 4 # Constants
+m_theme = "themes/3.jpg"
 
 def create_main_window(): # TODO this function should require a theme attribute
 	"""Creates a MainWindow."""
 	main_win = MainWindow()
 	main_win._setup_components()
+	main_win.setup_nav_bar()
 	main_win.setTheme(m_theme)
 	main_windows.append(main_win)
 	main_win.show()
@@ -92,7 +96,6 @@ class MainWindow(QMainWindow):
 
 		self.nav_bar = NavBar()
 		# self.nav_bar.setVisible(False)
-		self.setup_nav_bar()
 
 		self.text_edit_layout = QHBoxLayout()
 		self.text_edit_layout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
@@ -116,6 +119,8 @@ class MainWindow(QMainWindow):
 
 		self.setCurrentFile('')
 		self.paged_text_edit.document().contentsChanged.connect(self.documentWasModified)
+		self.paged_text_edit.currentCharFormatChanged.connect(self.updateFontWidgets)
+		self.paged_text_edit.cursorPositionChanged.connect(self.updateIndentWidgets)
 
 	def _setup_components(self):
 		self._create_menus()
@@ -135,7 +140,6 @@ class MainWindow(QMainWindow):
 		self.file_menu.addSeparator()
 		self.file_menu.addAction(self.exit_action)
 
-		self.edit_menu.addAction(self.font_action)
 		self.edit_menu.addAction(self.cut_action)
 		self.edit_menu.addAction(self.copy_action)
 		self.edit_menu.addAction(self.paste_action)
@@ -154,13 +158,9 @@ class MainWindow(QMainWindow):
 		self.main_tool_bar.addAction(self.fourth_action)
 		self.main_tool_bar.addAction(self.fifth_action)
 
-		self.main_tool_bar.addAction(self.bold_action)
-		self.main_tool_bar.addAction(self.italic_action)
-		self.main_tool_bar.addAction(self.underline_action)
-
 	def setup_nav_bar(self):
 		self.fontCombo = QFontComboBox()
-		self.fontCombo.currentFontChanged.connect(self.currentFontChanged)
+		self.fontCombo.currentFontChanged.connect(self._fontFamily)
 		self.nav_bar.addComponent(self.fontCombo)
 		
 		self.fontSizeCombo = QComboBox()
@@ -169,16 +169,15 @@ class MainWindow(QMainWindow):
 			self.fontSizeCombo.addItem(str(i))
 		validator = QIntValidator(2, 64, self)
 		self.fontSizeCombo.setValidator(validator)
-		self.fontSizeCombo.currentIndexChanged.connect(self.fontSizeChanged)
+		self.fontSizeCombo.currentIndexChanged.connect(self._fontSize)
 		self.nav_bar.addComponent(self.fontSizeCombo)
 		
 		self.fontColorToolButton = QToolButton()
 		self.fontColorToolButton.setPopupMode(QToolButton.MenuButtonPopup)
 		self.fontColorToolButton.setMenu(self.createColorMenu(self.textColorChanged, Qt.black))
-		self.textAction = self.fontColorToolButton.menu().defaultAction()
-		self.fontColorToolButton.setIcon(Utils.createColorToolButtonIcon('images/textpointer.png', Qt.black))
+		# self.textAction = self.fontColorToolButton.menu().defaultAction()
+		self.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('images/textpointer.png', Qt.black))
 		self.fontColorToolButton.setAutoFillBackground(True)
-
 		# FIXME parameter is set to bool; get selected menu color and parse as argument
 		self.fontColorToolButton.clicked.connect(self.textButtonTriggered)
 		self.nav_bar.addComponent(self.fontColorToolButton)
@@ -188,6 +187,26 @@ class MainWindow(QMainWindow):
 		self.pageScaleCombo.setCurrentIndex(2)
 		self.pageScaleCombo.currentIndexChanged[str].connect(self.pageScaleChanged)
 		self.nav_bar.addComponent(self.pageScaleCombo)
+
+		editBar = QWidget()
+		editLay = QHBoxLayout(editBar)
+		editLay.setSizeConstraint(QLayout.SetFixedSize)
+		for action in self.edit_actions:
+			button = QToolButton()
+			button.setDefaultAction(action)
+			editLay.addWidget(button)
+		editBar.setLayout(editLay)
+		self.nav_bar.addComponent(editBar)
+
+		indentBar = QWidget()
+		indentLay = QHBoxLayout(indentBar)
+		indentLay.setSizeConstraint(QLayout.SetFixedSize)
+		for action in self.indent_actions:
+			button = QToolButton()
+			button.setDefaultAction(action)
+			indentLay.addWidget(button)
+		indentBar.setLayout(indentLay)
+		self.nav_bar.addComponent(indentBar)
 
 	def _create_actions(self):
 		self.new_action  = QAction(QIcon('images/new.png'), "&New", self, shortcut=QKeySequence.New, statusTip="Create a New File", triggered=self.newFile)
@@ -202,20 +221,19 @@ class MainWindow(QMainWindow):
 		self.select_all_action = QAction(QIcon('images/selectAll.png'), "Select All", self, statusTip="Select All", triggered=self.paged_text_edit.selectAll)
 		self.redo_action = QAction(QIcon('images/redo.png'),"Redo", self, shortcut=QKeySequence.Redo, statusTip="Redo previous action", triggered=self.paged_text_edit.redo)
 		self.undo_action = QAction(QIcon('images/undo.png'),"Undo", self, shortcut=QKeySequence.Undo, statusTip="Undo previous action", triggered=self.paged_text_edit.undo)
-		
 		self.themes_action = QAction(QIcon('images/save.png'), "&Themes...", self, statusTip = "Themes", triggered = self.fontChange)
-		
-		self.font_action = QAction("F&ont", self, statusTip = "Modify font properties", triggered = self.fontChange)
-		
-		self.bold_action = QAction(QIcon('images/bold.png'),"Bold", self, checkable=True, 
-				shortcut=QKeySequence.Bold, triggered=self.bold)
-		self.italic_action = QAction(QIcon('images/italic.png'), "Italic", self, checkable=True, 
-				shortcut=QKeySequence.Italic, triggered=self.italic)
-		self.underline_action = QAction(QIcon('images/underline.png'), "Underline", self, checkable=True, 
-				shortcut=QKeySequence.Underline, triggered=self.underline)
-
 		self.about_action = QAction(QIcon('images/about.png'), 'A&bout', self, shortcut = QKeySequence(QKeySequence.HelpContents), triggered=self.about_pablo)
 
+		# Actions grouped into tuples to ease display in navbar
+		self.edit_actions = (QAction(QIcon('images/bold.png'), "Bold", self, checkable=True, shortcut=QKeySequence.Bold, triggered=self._bold),
+				QAction(QIcon('images/italic.png'), "Italic", self, checkable=True, shortcut=QKeySequence.Italic, triggered=self._italic),
+				QAction(QIcon('images/underline.png'), "Underline", self, checkable=True, shortcut=QKeySequence.Underline, triggered=self._underline))
+		self.indent_actions = (QAction(QIcon('images/undo.png'), "Left", self, checkable=True, statusTip="Left indent", triggered=self._indentLeft),
+				QAction(QIcon('images/undo.png'), "Right", self, checkable=True, statusTip="Right indent", triggered=self._indentRight),
+				QAction(QIcon('images/undo.png'), "Center", self, checkable=True, shortcut="Ctrl+E", statusTip="Center indent", triggered=self._indentCenter),
+				QAction(QIcon('images/undo.png'), "Justify", self, checkable=True, statusTip="Justify indent", triggered=self._indentJustify))
+
+		
 		# Side toolbar actions...
 		self.first_action = QAction(QIcon('images/arrow.png'), "&Side1", self, statusTip = "ph", triggered=self.toggleNavigationBar)
 		self.second_action = QAction(QIcon('images/music.png'), "&Side2", self, statusTip = "ph", triggered=self.toggleNavigationBar)
@@ -384,37 +402,91 @@ class MainWindow(QMainWindow):
 		settings.setValue("pos", self.pos())
 		settings.setValue("size", self.size())
 		
-	def bold(self):
+	def _bold(self):
 		format = QTextCharFormat()
-		format.setFontWeight(QFont.Bold if self.bold_action.isChecked() else QFont.Normal)
+		format.setFontWeight(QFont.Bold if self.edit_actions[0].isChecked() else QFont.Normal)
 		self.paged_text_edit.mergeCurrentCharFormat(format)
 		
-	def italic(self):
+	def _italic(self):
 		format = QTextCharFormat()
-		format.setFontItalic(self.italic_action.isChecked())
+		format.setFontItalic(self.edit_actions[1].isChecked())
 		self.paged_text_edit.mergeCurrentCharFormat(format)
 		
-	def underline(self):
+	def _underline(self):
 		format = QTextCharFormat()
-		format.setFontUnderline(self.underline_action.isChecked())
+		format.setFontUnderline(self.edit_actions[2].isChecked())
 		self.paged_text_edit.mergeCurrentCharFormat(format)
 		
-	def currentFontChanged(self):
+	def _fontFamily(self):
 		format = QTextCharFormat()
-		format.setFont(self.fontCombo.currentFont())
+		format.setFontFamily(self.fontCombo.currentFont().family())
 		self.paged_text_edit.mergeCurrentCharFormat(format)
 
-	def fontSizeChanged(self):
+	def _fontSize(self):
 		format = QTextCharFormat()
 		format.setFontPointSize(int(self.fontSizeCombo.currentText()))
 		self.paged_text_edit.mergeCurrentCharFormat(format)
+
+	@Slot(QTextCharFormat)
+	def updateFontWidgets(self, format):
+		"""Responsible for updating font widgets when cursor position is changed.
+		Checks for bold, italic, underline, font size, font family and font color in selected text. """
+
+		self.edit_actions[0].setChecked(True if format.fontWeight() == QFont.Bold else False)
+		self.edit_actions[1].setChecked(format.fontItalic())
+		self.edit_actions[2].setChecked(format.fontUnderline())
+
+		self.fontSizeCombo.setCurrentIndex(self.fontSizeCombo.findText(str(int(format.fontPointSize()))))
+		self.fontCombo.setCurrentIndex(self.fontCombo.findText(str(format.fontFamily())))
+		self.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('images/textpointer.png', format.foreground()))
+
+	def updateIndentWidgets(self):
+		"""Responsible for updating indent widgets."""
+
+		al = self.paged_text_edit.alignment()
+		if(al == Qt.AlignLeft):
+			self.indent_triggered(LEFT_INDENT)
+		elif(al == Qt.AlignRight):
+			self.indent_triggered(RIGHT_INDENT)
+		elif(al == Qt.AlignCenter):
+			self.indent_triggered(CENTER_INDENT)
+		elif(al == Qt.AlignJustify):
+			self.indent_triggered(JUSTIFY_INDENT)
+
+	def _indentLeft(self):
+		self.paged_text_edit.setAlignment(Qt.AlignLeft)
+
+	def _indentRight(self):
+		self.paged_text_edit.setAlignment(Qt.AlignRight)
+
+	def _indentCenter(self):
+		self.paged_text_edit.setAlignment(Qt.AlignCenter)
+
+	def _indentJustify(self):
+		self.paged_text_edit.setAlignment(Qt.AlignJustify)
+
+	def indent_triggered(self, indent):
+		self.indent_actions[0].setChecked(False)
+		self.indent_actions[1].setChecked(False)
+		self.indent_actions[2].setChecked(False)
+		self.indent_actions[3].setChecked(False)
+
+		# TODO Use dict as alternative to Switch statement here
+		if(indent == LEFT_INDENT):
+			self.indent_actions[0].setChecked(True)
+		elif(indent == RIGHT_INDENT):
+			self.indent_actions[1].setChecked(True)
+		elif(indent == CENTER_INDENT):
+			self.indent_actions[2].setChecked(True)
+		elif(indent == JUSTIFY_INDENT):
+			self.indent_actions[3].setChecked(True)
 
 	def pageScaleChanged(self, scale):
 		pass
 
 	def textColorChanged(self):
 		newColor = QColor(self.sender().data())
-		self.fontColorToolButton.setIcon(Utils.createColorToolButtonIcon('images/textpointer.png', 
+		self.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('images/textpointer.png', 
 				newColor))
 		self.textButtonTriggered(newColor)
 
@@ -429,7 +501,7 @@ class MainWindow(QMainWindow):
 
 		colorMenu = QMenu(self)
 		for color, name in zip(colors, names):
-			action = QAction(Utils.createColorIcon(color), name, self,
+			action = QAction(ColorUtils.createColorIcon(color), name, self,
 					triggered=slot)
 			action.setData(QColor(color))
 			colorMenu.addAction(action)
