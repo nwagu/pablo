@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------------
-# Copyright (c) 2015-2018, PyInstaller Development Team.
+# Copyright (c) 2015-2019, PyInstaller Development Team.
 #
 # Distributed under the terms of the GNU General Public License with exception
 # for distributing bootloader.
@@ -14,5 +14,6 @@ import sys
 if sys.platform == 'darwin':
     os.environ['QTWEBENGINEPROCESS_PATH'] = os.path.normpath(os.path.join(
         sys._MEIPASS, '..', 'Resources', 'PyQt5', 'Qt', 'lib',
-        'QtWebEngineCore.framework', 'Helpers'
+        'QtWebEngineCore.framework', 'Helpers', 'QtWebEngineProcess.app',
+        'Contents', 'MacOS', 'QtWebEngineProcess'
     ))

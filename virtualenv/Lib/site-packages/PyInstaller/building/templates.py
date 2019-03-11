@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------------
-# Copyright (c) 2005-2018, PyInstaller Development Team.
+# Copyright (c) 2005-2019, PyInstaller Development Team.
 #
 # Distributed under the terms of the GNU General Public License with exception
 # for distributing bootloader.
@@ -12,7 +12,7 @@
 Templates to generate .spec files.
 """
 
-onefiletmplt = """# -*- mode: python -*-
+onefiletmplt = """# -*- mode: python ; coding: utf-8 -*-
 %(cipher_init)s
 
 a = Analysis(%(scripts)s,
@@ -44,7 +44,7 @@ exe = EXE(pyz,
           console=%(console)s %(exe_options)s)
 """
 
-onedirtmplt = """# -*- mode: python -*-
+onedirtmplt = """# -*- mode: python ; coding: utf-8 -*-
 %(cipher_init)s
 
 a = Analysis(%(scripts)s,

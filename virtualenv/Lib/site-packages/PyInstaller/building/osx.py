@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------------
-# Copyright (c) 2005-2018, PyInstaller Development Team.
+# Copyright (c) 2005-2019, PyInstaller Development Team.
 #
 # Distributed under the terms of the GNU General Public License with exception
 # for distributing bootloader.
@@ -25,13 +25,18 @@ class BUNDLE(Target):
         if not is_darwin:
             return
 
-        # .icns icon for app bundle.
-        # Use icon supplied by user or just use the default one from PyInstaller.
+        # get a path to a .icns icon for the app bundle.
         self.icon = kws.get('icon')
         if not self.icon:
+            # --icon not specified; use the default in the pyinstaller folder
             self.icon = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                 'bootloader', 'images', 'icon-windowed.icns')
-        # Ensure icon path is absolute.
+        else:
+            # user gave an --icon=path. If it is relative, make it
+            # relative to the spec file location.
+            if not os.path.isabs(self.icon):
+                self.icon = os.path.join(CONF['specpath'], self.icon)
+        # ensure icon path is absolute
         self.icon = os.path.abspath(self.icon)
 
         Target.__init__(self)
@@ -174,7 +179,12 @@ class BUNDLE(Target):
                 todir = os.path.dirname(tofnm)
                 if not os.path.exists(todir):
                     os.makedirs(todir)
-                shutil.copy(fnm, tofnm)
+                if os.path.isdir(fnm):
+                    # beacuse shutil.copy2() is the default copy function
+                    # for shutil.copytree, this will also copy file metadata
+                    shutil.copytree(fnm, tofnm)
+                else:
+                    shutil.copy(fnm, tofnm)
 
         logger.info('moving BUNDLE data files to Resource directory')
 
@@ -190,7 +200,12 @@ class BUNDLE(Target):
                 todir = os.path.dirname(tofnm)
                 if not os.path.exists(todir):
                     os.makedirs(todir)
-                shutil.copy(fnm, tofnm)
+                if os.path.isdir(fnm):
+                    # beacuse shutil.copy2() is the default copy function
+                    # for shutil.copytree, this will also copy file metadata
+                    shutil.copytree(fnm, tofnm)
+                else:
+                    shutil.copy(fnm, tofnm)
                 base_path = os.path.split(inm)[0]
                 if base_path:
                     if not os.path.exists(os.path.join(bin_dir, inm)):

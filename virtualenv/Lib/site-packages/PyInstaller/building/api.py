@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------------
-# Copyright (c) 2005-2018, PyInstaller Development Team.
+# Copyright (c) 2005-2019, PyInstaller Development Team.
 #
 # Distributed under the terms of the GNU General Public License with exception
 # for distributing bootloader.
@@ -419,6 +419,12 @@ class EXE(Target):
                 self.toc.append(("pyi-windows-manifest-filename " + manifest_filename,
                                  "", "OPTION"))
 
+            if self.versrsrc:
+                if not os.path.isabs(self.versrsrc):
+                    # relative version-info path is relative to spec file
+                    self.versrsrc = os.path.join(
+                        CONF['specpath'], self.versrsrc)
+
         self.pkg = PKG(self.toc, cdict=kwargs.get('cdict', None),
                        exclude_binaries=self.exclude_binaries,
                        strip_binaries=self.strip, upx_binaries=self.upx,
@@ -503,6 +509,7 @@ class EXE(Target):
         return bootloader_file
 
     def assemble(self):
+        from ..config import CONF
         logger.info("Building EXE from %s", self.tocbasename)
         trash = []
         if os.path.exists(self.name):
@@ -530,6 +537,8 @@ class EXE(Target):
                     except ValueError:
                         pass
                 resfile = res[0]
+                if not os.path.isabs(resfile):
+                    resfile = os.path.join(CONF['specpath'], resfile)
                 restype = resname = reslang = None
                 if len(res) > 1:
                     restype = res[1]
@@ -568,6 +577,8 @@ class EXE(Target):
                         logger.error("Error while updating resource %s %s in %s"
                                      " from data file %s",
                                      restype, resname, tmpnm, resfile, exc_info=1)
+            if is_win and self.manifest and not self.exclude_binaries:
+                self.manifest.update_resources(tmpnm, [1])
             trash.append(tmpnm)
             exe = tmpnm
 
@@ -706,7 +717,12 @@ class COLLECT(Target):
                                  upx=(self.upx_binaries and (is_win or is_cygwin)),
                                  dist_nm=inm)
             if typ != 'DEPENDENCY':
-                shutil.copy(fnm, tofnm)
+                if os.path.isdir(fnm):
+                    # beacuse shutil.copy2() is the default copy function
+                    # for shutil.copytree, this will also copy file metadata
+                    shutil.copytree(fnm, tofnm)
+                else:
+                    shutil.copy(fnm, tofnm)
                 try:
                     shutil.copystat(fnm, tofnm)
                 except OSError:

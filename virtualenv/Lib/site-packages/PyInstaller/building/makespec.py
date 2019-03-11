@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------------
-# Copyright (c) 2005-2018, PyInstaller Development Team.
+# Copyright (c) 2005-2019, PyInstaller Development Team.
 #
 # Distributed under the terms of the GNU General Public License with exception
 # for distributing bootloader.
@@ -19,7 +19,7 @@ from distutils.version import LooseVersion
 
 from .. import HOMEPATH, DEFAULT_SPECPATH
 from .. import log as logging
-from ..compat import expand_path, is_darwin
+from ..compat import expand_path, is_darwin, open_file, text_type
 from .templates import onefiletmplt, onedirtmplt, cipher_absent_template, \
     cipher_init_template, bundleexetmplt, bundletmplt
 
@@ -172,11 +172,10 @@ def __add_options(parser):
                    # If this option is not specified, then its default value is
                    # an empty list (no debug options selected).
                    default=[],
-                   # Allow the user to specify any number of arguments.
-                   nargs='?',
-                   # If zero arguments are specified (``--debug`` by itself),
-                   # then provide a default argument of all debug options enabled.
-                   const=DEBUG_ALL_CHOICE,
+                   # Note that ``nargs`` is omitted. This produces a single item
+                   # not stored in a list, as opposed to list containing one
+                   # item, per `nargs <https://docs.python.org/3/library/argparse.html#nargs>`_.
+                   nargs=None,
                    # The options specified must come from this list.
                    choices=DEBUG_ALL_CHOICE + DEBUG_ARGUMENT_CHOICES,
                    # Append choice, rather than storing them (which would
@@ -185,12 +184,10 @@ def __add_options(parser):
                    # Allow newlines in the help text; see the
                    # ``_SmartFormatter`` in ``__main__.py``.
                    help=("R|Provide assistance with debugging a frozen\n"
-                         "application, by specifying one or more of the\n"
-                         "following choices.\n"
+                         "application. This argument may be provided multiple\n"
+                         "times to select several of the following options.\n"
                          "\n"
-                         "- all: All three of the below options; this is the\n"
-                         "  default choice, unless one of the choices below is\n"
-                         "  specified.\n"
+                         "- all: All three of the following options.\n"
                          "\n"
                          "- imports: specify the -v option to the underlying\n"
                          "  Python interpreter, causing it to print a message\n"
@@ -399,7 +396,7 @@ def main(scripts, name=None, onefile=None,
     if debug is None:
         debug = []
     # Translate the ``all`` option.
-    if DEBUG_ALL_CHOICE in debug:
+    if DEBUG_ALL_CHOICE[0] in debug:
         debug = DEBUG_ARGUMENT_CHOICES
 
     d = {
@@ -437,16 +434,16 @@ def main(scripts, name=None, onefile=None,
 
     # Write down .spec file to filesystem.
     specfnm = os.path.join(specpath, name + '.spec')
-    with open(specfnm, 'w') as specfile:
+    with open_file(specfnm, 'w', encoding='utf-8') as specfile:
         if onefile:
-            specfile.write(onefiletmplt % d)
+            specfile.write(text_type(onefiletmplt % d))
             # For OSX create .app bundle.
             if is_darwin and not console:
-                specfile.write(bundleexetmplt % d)
+                specfile.write(text_type(bundleexetmplt % d))
         else:
-            specfile.write(onedirtmplt % d)
+            specfile.write(text_type(onedirtmplt % d))
             # For OSX create .app bundle.
             if is_darwin and not console:
-                specfile.write(bundletmplt % d)
+                specfile.write(text_type(bundletmplt % d))
 
     return specfnm
