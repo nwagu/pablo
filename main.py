@@ -16,7 +16,7 @@ from PIL import Image
 
 main_windows = []
 LEFT_INDENT = 1; RIGHT_INDENT = 2; CENTER_INDENT = 3; JUSTIFY_INDENT = 4 # Constants
-m_theme = "themes/3.jpg"
+m_theme = "themes/7.jpg"
 
 def create_main_window(): # TODO this function should require a theme attribute
 	"""Creates a MainWindow."""
@@ -28,6 +28,8 @@ def create_main_window(): # TODO this function should require a theme attribute
 	return main_win
 
 class NavBar(QScrollArea):
+
+	CURRENT_TAB = 0
 	
 	def __init__(self):
 		super(NavBar, self).__init__()
@@ -48,7 +50,6 @@ class NavBar(QScrollArea):
 		self.setWidgetResizable(True)
 		self.setWidget(self.wid)
 		self.wid.setLayout(self.vLayout)
-		
 		
 	def addComponent(self, component):
 		self.vLayout.addWidget(component)
@@ -74,8 +75,8 @@ class MainWindow(QMainWindow):
 		self.setWindowIcon(QIcon('images/icon.png'))
 		self.setWindowState(Qt.WindowFullScreen)
 		self.setWindowState(Qt.WindowMaximized)
-		available_geometry = app.desktop().availableGeometry(self)
-		self.resize(available_geometry.width(), available_geometry.height())
+		# available_geometry = app.desktop().availableGeometry(self)
+		# self.resize(available_geometry.width(), available_geometry.height())
 		self.readSettings()
 
 		self.container = QWidget()
@@ -98,7 +99,7 @@ class MainWindow(QMainWindow):
 		self.paged_text_edit.setPageNumbersAlignment(Qt.AlignBottom | Qt.AlignCenter)
 
 		self.nav_bar = NavBar()
-		# self.nav_bar.setVisible(False)
+		self.nav_bar.setVisible(False)
 
 		self.text_edit_layout = QHBoxLayout()
 		self.text_edit_layout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
@@ -162,19 +163,41 @@ class MainWindow(QMainWindow):
 		self.main_tool_bar.addAction(self.main_themes_action)
 
 	def formatNav(self):
-		self.nav_bar.clearNavBar()
-		self.nav_bar.addComponent(self.fontCombo)
-		self.nav_bar.addComponent(self.fontSizeCombo)
-		self.nav_bar.addComponent(self.fontColorToolButton)
-		self.nav_bar.addComponent(self.editBar)
-		self.nav_bar.addComponent(self.indentBar)
+		if(self.nav_bar.CURRENT_TAB != 1):
+			self.nav_bar.clearNavBar()
+			self.nav_bar.addComponent(self.fontCombo)
+			self.nav_bar.addComponent(self.fontSizeCombo)
+			self.nav_bar.addComponent(self.fontColorToolButton)
+			self.nav_bar.addComponent(self.editBar)
+			self.nav_bar.addComponent(self.indentBar)
+			self.nav_bar.CURRENT_TAB = 1
+
+			if(not self.nav_bar.isVisible()):
+				self.nav_bar.setVisible(True)
+		else:
+			self.nav_bar.setVisible(not self.nav_bar.isVisible())
 
 	def sectionNav(self):
-		self.nav_bar.clearNavBar()
-		self.nav_bar.addComponent(self.pageScaleCombo)
+		if(self.nav_bar.CURRENT_TAB != 2):
+			self.nav_bar.clearNavBar()
+			self.nav_bar.addComponent(self.pageScaleCombo)
+			self.nav_bar.CURRENT_TAB = 2
+
+			if(not self.nav_bar.isVisible()):
+				self.nav_bar.setVisible(True)
+		else:
+			self.nav_bar.setVisible(not self.nav_bar.isVisible())
 
 	def themesNav(self):
-		self.nav_bar.clearNavBar()
+		if(self.nav_bar.CURRENT_TAB != 3):
+			self.nav_bar.clearNavBar()
+			# self.nav_bar.addComponent(self.pageScaleCombo)
+			self.nav_bar.CURRENT_TAB = 3
+
+			if(not self.nav_bar.isVisible()):
+				self.nav_bar.setVisible(True)
+		else:
+			self.nav_bar.setVisible(not self.nav_bar.isVisible())
 
 	def _create_nav_widgets(self):
 		self.fontCombo = QFontComboBox()
@@ -206,6 +229,7 @@ class MainWindow(QMainWindow):
 		editLay = QHBoxLayout(self.editBar)
 		editLay.setSizeConstraint(QLayout.SetFixedSize)
 		for action in self.edit_actions:
+			self.addAction(action) # prevents action from being disabled when navbar is hidden
 			button = QToolButton()
 			button.setDefaultAction(action)
 			editLay.addWidget(button)
@@ -215,6 +239,7 @@ class MainWindow(QMainWindow):
 		indentLay = QHBoxLayout(self.indentBar)
 		indentLay.setSizeConstraint(QLayout.SetFixedSize)
 		for action in self.indent_actions:
+			self.addAction(action) # prevents action from being disabled when navbar is hidden
 			button = QToolButton()
 			button.setDefaultAction(action)
 			indentLay.addWidget(button)
@@ -470,16 +495,17 @@ class MainWindow(QMainWindow):
 		self.paged_text_edit.setAlignment(Qt.AlignRight)
 
 	def _indentCenter(self):
-		self.paged_text_edit.setAlignment(Qt.AlignCenter)
+		if(self.paged_text_edit.alignment() == Qt.AlignCenter):
+			self._indentLeft()
+		else:
+			self.paged_text_edit.setAlignment(Qt.AlignCenter)
 
 	def _indentJustify(self):
 		self.paged_text_edit.setAlignment(Qt.AlignJustify)
 
 	def indent_triggered(self, indent):
-		self.indent_actions[0].setChecked(False)
-		self.indent_actions[1].setChecked(False)
-		self.indent_actions[2].setChecked(False)
-		self.indent_actions[3].setChecked(False)
+		for action in self.indent_actions:
+			action.setChecked(False)
 
 		# TODO Use dict as alternative to Switch statement here
 		if(indent == LEFT_INDENT):
@@ -537,9 +563,6 @@ class MainWindow(QMainWindow):
 	def printMessageOnStatus(self, message, timeout=5000):                                                   
 		self.statusBar.showMessage(message, timeout)
 
-	def toggleNavigationBar(self):
-		self.nav_bar.setVisible(not self.nav_bar.isVisible())
-
 	def setTheme(self, themePath):
 		self.container.setObjectName("ThemeContainer")
 		self.container.setStyleSheet("QWidget#ThemeContainer { border-image: url(" + themePath + ");}");
@@ -568,7 +591,7 @@ class MainWindow(QMainWindow):
 		self.nav_bar.setStyleSheet("QScrollArea { background-color: " + colour_hex + "; border: none; border-left: 1px solid white;}");
 
 
-if __name__ == '__main__':
+def main():
 
 	import sys
 
