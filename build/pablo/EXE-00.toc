@@ -34,6 +34,9 @@
   ('pyi_rth_pkgres',
    'c:\\users\\cn\\desktop\\pablo\\virtualenv\\lib\\site-packages\\PyInstaller\\loader\\rthooks\\pyi_rth_pkgres.py',
    'PYSOURCE'),
+  ('pyi_rth_win32comgenpy',
+   'c:\\users\\cn\\desktop\\pablo\\virtualenv\\lib\\site-packages\\PyInstaller\\loader\\rthooks\\pyi_rth_win32comgenpy.py',
+   'PYSOURCE'),
   ('pablo', 'C:\\Users\\cn\\Desktop\\Pablo\\pablo.py', 'PYSOURCE'),
   ('pablo.exe.manifest',
    'C:\\Users\\cn\\Desktop\\Pablo\\build\\pablo\\pablo.exe.manifest',
@@ -41,7 +44,7 @@
  [],
  False,
  False,
- 1552303796,
+ 1552432211,
  [('run.exe',
    'c:\\users\\cn\\desktop\\pablo\\virtualenv\\lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit\\run.exe',
    'EXECUTABLE')])

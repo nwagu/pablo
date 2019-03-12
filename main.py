@@ -1,4 +1,6 @@
 
+import sys
+
 import struct
 import numpy as np
 import scipy
@@ -592,8 +594,6 @@ class MainWindow(QMainWindow):
 
 
 def main():
-
-	import sys
 
 	app = QApplication(sys.argv)
 	pixmap = QPixmap("images/splash.png")

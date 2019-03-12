@@ -29,4 +29,6 @@ if defined _OLD_VIRTUAL_PATH (
 
 set "PATH=%VIRTUAL_ENV%\Scripts;%PATH%"
 
+set PYTHONPATH="C:\Users\cn\Desktop\Pablo\virtualenv\Lib\site-packages"
+
 :END

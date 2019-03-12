@@ -2,13 +2,18 @@
 
 block_cipher = None
 
+added_files = [
+        ('files/*', 'files'),
+        ('themes/*', 'themes'),
+        ('images/*', 'images')
+         ]
 
 a = Analysis(['pablo.py'],
-             pathex=['C:\\Users\\cn\\Desktop\\Pablo'],
-             binaries=[],
-             datas=[],
-             hiddenimports=[],
-             hookspath=[],
+             pathex=['C:\\Users\\cn\\Desktop\\Pablo', 'C:\\Users\\cn\\Desktop\\Pablo\\virtualenv\\Lib\\site-packages\\shiboken2'],
+             binaries = [],
+             datas = added_files,
+             hiddenimports=['typing', 'inspect'],
+             hookspath=['hooks'],
              runtime_hooks=[],
              excludes=[],
              win_no_prefer_redirects=False,

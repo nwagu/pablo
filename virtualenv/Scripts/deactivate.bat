@@ -18,4 +18,6 @@ set _OLD_VIRTUAL_PATH=
 
 set VIRTUAL_ENV=
 
+set PYTHONPATH=
+
 :END
