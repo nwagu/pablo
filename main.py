@@ -9,6 +9,7 @@ import scipy.cluster
 
 from views.pagedtextedit import PagedTextEdit
 from utils.colorutils import ColorUtils
+from utils.genutils import GenUtils
 
 from PySide2.QtCore import *
 from PySide2.QtGui import *
@@ -18,7 +19,7 @@ from PIL import Image
 
 main_windows = []
 LEFT_INDENT = 1; RIGHT_INDENT = 2; CENTER_INDENT = 3; JUSTIFY_INDENT = 4 # Constants
-m_theme = "themes/7.jpg"
+m_theme = GenUtils.resource_path("themes/7.jpg")
 
 def create_main_window(): # TODO this function should require a theme attribute
 	"""Creates a MainWindow."""
@@ -567,7 +568,8 @@ class MainWindow(QMainWindow):
 
 	def setTheme(self, themePath):
 		self.container.setObjectName("ThemeContainer")
-		self.container.setStyleSheet("QWidget#ThemeContainer { border-image: url(" + themePath + ");}");
+		self.container.setStyleSheet("QWidget#ThemeContainer { border-image: url(" + themePath + ");}")
+		print(themePath)
 
 		# Get the dominant colour from the theme image
 		NUM_CLUSTERS = 5
@@ -591,7 +593,6 @@ class MainWindow(QMainWindow):
 		self.pageInfoStatusLabel.setStyleSheet(".QLabel { color: white; font-weight: 800; }")
 		self.statusBar.setStyleSheet(".QStatusBar { background-color: transparent; border: none; color: white;}")
 		self.nav_bar.setStyleSheet("QScrollArea { background-color: " + colour_hex + "; border: none; border-left: 1px solid white;}");
-
 
 def main():
 
