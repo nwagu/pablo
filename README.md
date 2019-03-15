@@ -8,5 +8,4 @@ Pablo is designed to be unobtrusive, does not get in your way
 You are Aladdin!
 
 To create an exe with pyinstaller, run the pablo.spec file like this
-'pyinstaller pablo.spec'
-
+`pyinstaller pablo.spec`
