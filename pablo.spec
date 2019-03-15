@@ -21,6 +21,7 @@ a = Analysis(['pablo.py'],
         cipher=block_cipher,
         noarchive=False)
 
+
 pyz = PYZ(a.pure, 
         a.zipped_data,
         cipher=block_cipher)
