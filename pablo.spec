@@ -2,14 +2,8 @@
 
 block_cipher = None
 
-added_files = [
-        ('files', 'files'),
-        ('themes', 'themes'),
-        ('images', 'images')
-         ]
-
-a = Analysis(['pablo.py'],
-        pathex=['C:\\Users\\cn\\Desktop\\Pablo', 'C:\\Users\\cn\\Desktop\\Pablo\\virtualenv\\Lib\\site-packages\\shiboken2'],
+a = Analysis(['src/main.py'],
+        pathex=['C:\\Users\\cn\\Desktop\\Pablo\\src', 'C:\\Users\\cn\\Desktop\\Pablo\\virtualenv\\Lib\\site-packages\\shiboken2'],
         binaries = [],
         datas = [],
         hiddenimports=['typing', 'inspect'],
@@ -27,9 +21,9 @@ pyz = PYZ(a.pure,
         cipher=block_cipher)
 
 exe = EXE(pyz,
-        Tree('files', prefix='files'),
-        Tree('images', prefix='images'),
-        Tree('themes', prefix='themes'),
+        Tree('src/files', prefix='src/files'),
+        Tree('src/images', prefix='src/images'),
+        Tree('src/themes', prefix='src/themes'),
         a.scripts,
         a.binaries,
         a.zipfiles,

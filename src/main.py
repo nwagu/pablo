@@ -19,7 +19,7 @@ from PIL import Image
 
 main_windows = []
 LEFT_INDENT = 1; RIGHT_INDENT = 2; CENTER_INDENT = 3; JUSTIFY_INDENT = 4 # Constants
-m_theme = GenUtils.resource_path("themes/3.jpg")
+m_theme = GenUtils.resource_path('src/themes/3.jpg')
 
 def create_main_window(): # TODO this function should require a theme attribute
 	"""Creates a MainWindow."""
@@ -75,7 +75,7 @@ class MainWindow(QMainWindow):
 		self.curPage = (0, 0) # Tuple containing current page and total pages of the current file
 
 		self.setWindowTitle('Pablo Editor')
-		self.setWindowIcon(QIcon('images/icon.png'))
+		self.setWindowIcon(QIcon('src/images/icon.png'))
 		self.setWindowState(Qt.WindowFullScreen)
 		self.setWindowState(Qt.WindowMaximized)
 		# available_geometry = app.desktop().availableGeometry(self)
@@ -219,7 +219,7 @@ class MainWindow(QMainWindow):
 		self.fontColorToolButton.setPopupMode(QToolButton.MenuButtonPopup)
 		self.fontColorToolButton.setMenu(self.createColorMenu(self.textColorChanged, Qt.black))
 		# self.textAction = self.fontColorToolButton.menu().defaultAction()
-		self.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('images/textpointer.png', Qt.black))
+		self.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('src/images/textpointer.png', Qt.black))
 		# FIXME parameter is set to bool; get selected menu color and parse as argument
 		self.fontColorToolButton.clicked.connect(self.textButtonTriggered)
 		
@@ -249,35 +249,35 @@ class MainWindow(QMainWindow):
 		self.indentBar.setLayout(indentLay)
 
 	def _create_actions(self):
-		self.new_action  = QAction(QIcon(GenUtils.resource_path('images/new.png')), "&New", self, shortcut=QKeySequence.New, statusTip="Create a New File", triggered=self.newFile)
-		self.open_action = QAction(QIcon(GenUtils.resource_path('images/open.png')), "O&pen", self, shortcut=QKeySequence.Open, statusTip="Open an existing file", triggered=self.open)
-		self.save_action = QAction(QIcon(GenUtils.resource_path('images/save.png')), "&Save", self, shortcut=QKeySequence.Save, statusTip="Save the current file to disk", triggered=self.save)
-		self.save_as_action = QAction(QIcon(GenUtils.resource_path('images/save.png')), "Save &As...", self, shortcut=QKeySequence.SaveAs, statusTip="Save the current file under a new name", triggered=self.saveAs)
-		self.print_action = QAction(QIcon(GenUtils.resource_path('images/print.png')), "&Print...", self, shortcut=QKeySequence.Print, statusTip="Print the current file", triggered=self.print_)
+		self.new_action  = QAction(QIcon(GenUtils.resource_path('src/images/new.png')), "&New", self, shortcut=QKeySequence.New, statusTip="Create a New File", triggered=self.newFile)
+		self.open_action = QAction(QIcon(GenUtils.resource_path('src/images/open.png')), "O&pen", self, shortcut=QKeySequence.Open, statusTip="Open an existing file", triggered=self.open)
+		self.save_action = QAction(QIcon(GenUtils.resource_path('src/images/save.png')), "&Save", self, shortcut=QKeySequence.Save, statusTip="Save the current file to disk", triggered=self.save)
+		self.save_as_action = QAction(QIcon(GenUtils.resource_path('src/images/save.png')), "Save &As...", self, shortcut=QKeySequence.SaveAs, statusTip="Save the current file under a new name", triggered=self.saveAs)
+		self.print_action = QAction(QIcon(GenUtils.resource_path('src/images/print.png')), "&Print...", self, shortcut=QKeySequence.Print, statusTip="Print the current file", triggered=self.print_)
 		self.exit_action = QAction(QIcon.fromTheme("application-exit"), "E&xit", self, shortcut="Ctrl+Q", statusTip="Exit the Application", triggered=self.close)
-		self.cut_action = QAction(QIcon(GenUtils.resource_path('images/cut.png')), "C&ut", self, shortcut=QKeySequence.Cut, statusTip="Cut the current selection to clipboard", triggered=self.paged_text_edit.cut)
-		self.copy_action = QAction(QIcon(GenUtils.resource_path('images/copy.png')), "C&opy", self, shortcut=QKeySequence.Copy, statusTip="Copy the current selection to clipboard", triggered=self.paged_text_edit.copy)
-		self.paste_action = QAction(QIcon(GenUtils.resource_path('images/paste.png')), "&Paste", self, shortcut=QKeySequence.Paste, statusTip="Paste the clipboard's content in current location", triggered=self.paged_text_edit.paste)
-		self.select_all_action = QAction(QIcon(GenUtils.resource_path('images/selectAll.png')), "Select All", self, statusTip="Select All", triggered=self.paged_text_edit.selectAll)
-		self.redo_action = QAction(QIcon(GenUtils.resource_path('images/redo.png')),"Redo", self, shortcut=QKeySequence.Redo, statusTip="Redo previous action", triggered=self.paged_text_edit.redo)
-		self.undo_action = QAction(QIcon(GenUtils.resource_path('images/undo.png')),"Undo", self, shortcut=QKeySequence.Undo, statusTip="Undo previous action", triggered=self.paged_text_edit.undo)
-		self.themes_action = QAction(QIcon(GenUtils.resource_path('images/save.png')), "&Themes...", self, statusTip = "Themes", triggered = self.fontChange)
-		self.about_action = QAction(QIcon(GenUtils.resource_path('images/about.png')), 'A&bout', self, shortcut = QKeySequence(QKeySequence.HelpContents), triggered=self.about_pablo)
+		self.cut_action = QAction(QIcon(GenUtils.resource_path('src/images/cut.png')), "C&ut", self, shortcut=QKeySequence.Cut, statusTip="Cut the current selection to clipboard", triggered=self.paged_text_edit.cut)
+		self.copy_action = QAction(QIcon(GenUtils.resource_path('src/images/copy.png')), "C&opy", self, shortcut=QKeySequence.Copy, statusTip="Copy the current selection to clipboard", triggered=self.paged_text_edit.copy)
+		self.paste_action = QAction(QIcon(GenUtils.resource_path('src/images/paste.png')), "&Paste", self, shortcut=QKeySequence.Paste, statusTip="Paste the clipboard's content in current location", triggered=self.paged_text_edit.paste)
+		self.select_all_action = QAction(QIcon(GenUtils.resource_path('src/images/selectAll.png')), "Select All", self, statusTip="Select All", triggered=self.paged_text_edit.selectAll)
+		self.redo_action = QAction(QIcon(GenUtils.resource_path('src/images/redo.png')),"Redo", self, shortcut=QKeySequence.Redo, statusTip="Redo previous action", triggered=self.paged_text_edit.redo)
+		self.undo_action = QAction(QIcon(GenUtils.resource_path('src/images/undo.png')),"Undo", self, shortcut=QKeySequence.Undo, statusTip="Undo previous action", triggered=self.paged_text_edit.undo)
+		self.themes_action = QAction(QIcon(GenUtils.resource_path('src/images/save.png')), "&Themes...", self, statusTip = "Themes", triggered = self.fontChange)
+		self.about_action = QAction(QIcon(GenUtils.resource_path('src/images/about.png')), 'A&bout', self, shortcut = QKeySequence(QKeySequence.HelpContents), triggered=self.about_pablo)
 
 		# Actions grouped into tuples to ease display in navbar
-		self.edit_actions = (QAction(QIcon(GenUtils.resource_path('images/bold.png')), "Bold", self, checkable=True, shortcut=QKeySequence.Bold, triggered=self._bold),
-				QAction(QIcon(GenUtils.resource_path('images/italic.png')), "Italic", self, checkable=True, shortcut=QKeySequence.Italic, triggered=self._italic),
-				QAction(QIcon(GenUtils.resource_path('images/underline.png')), "Underline", self, checkable=True, shortcut=QKeySequence.Underline, triggered=self._underline))
-		self.indent_actions = (QAction(QIcon(GenUtils.resource_path('images/align-left.png')), "Left", self, checkable=True, statusTip="Left indent", triggered=self._indentLeft),
-				QAction(QIcon(GenUtils.resource_path('images/align-right.png')), "Right", self, checkable=True, statusTip="Right indent", triggered=self._indentRight),
-				QAction(QIcon(GenUtils.resource_path('images/align-center.png')), "Center", self, checkable=True, shortcut="Ctrl+E", statusTip="Center indent", triggered=self._indentCenter),
-				QAction(QIcon(GenUtils.resource_path('images/align-justify.png')), "Justify", self, checkable=True, statusTip="Justify indent", triggered=self._indentJustify))
+		self.edit_actions = (QAction(QIcon(GenUtils.resource_path('src/images/bold.png')), "Bold", self, checkable=True, shortcut=QKeySequence.Bold, triggered=self._bold),
+				QAction(QIcon(GenUtils.resource_path('src/images/italic.png')), "Italic", self, checkable=True, shortcut=QKeySequence.Italic, triggered=self._italic),
+				QAction(QIcon(GenUtils.resource_path('src/images/underline.png')), "Underline", self, checkable=True, shortcut=QKeySequence.Underline, triggered=self._underline))
+		self.indent_actions = (QAction(QIcon(GenUtils.resource_path('src/images/align-left.png')), "Left", self, checkable=True, statusTip="Left indent", triggered=self._indentLeft),
+				QAction(QIcon(GenUtils.resource_path('src/images/align-right.png')), "Right", self, checkable=True, statusTip="Right indent", triggered=self._indentRight),
+				QAction(QIcon(GenUtils.resource_path('src/images/align-center.png')), "Center", self, checkable=True, shortcut="Ctrl+E", statusTip="Center indent", triggered=self._indentCenter),
+				QAction(QIcon(GenUtils.resource_path('src/images/align-justify.png')), "Justify", self, checkable=True, statusTip="Justify indent", triggered=self._indentJustify))
 
 		
 		# Side toolbar actions...
-		self.main_format_action = QAction(QIcon(GenUtils.resource_path('images/arrow.png')), "&Format", self, statusTip = "Format", triggered=self.formatNav)
-		self.main_sections_action = QAction(QIcon(GenUtils.resource_path('images/palm.png')), "&Sections", self, statusTip = "Sections", triggered=self.sectionNav)
-		self.main_themes_action = QAction(QIcon(GenUtils.resource_path('images/theme.png')), "&Themes", self, statusTip = "Themes", triggered=self.themesNav)
+		self.main_format_action = QAction(QIcon(GenUtils.resource_path('src/images/arrow.png')), "&Format", self, statusTip = "Format", triggered=self.formatNav)
+		self.main_sections_action = QAction(QIcon(GenUtils.resource_path('src/images/palm.png')), "&Sections", self, statusTip = "Sections", triggered=self.sectionNav)
+		self.main_themes_action = QAction(QIcon(GenUtils.resource_path('src/images/theme.png')), "&Themes", self, statusTip = "Themes", triggered=self.themesNav)
 		
 		self.cut_action.setEnabled(False)
 		self.copy_action.setEnabled(False)
@@ -313,7 +313,7 @@ class MainWindow(QMainWindow):
 
 	def open(self):
 		fileName, filtr = QFileDialog.getOpenFileName(self, "Open File", 
-				GenUtils.resource_path('files'), "PBL Files (*.pbl *.html)")
+				GenUtils.resource_path('src/files'), "PBL Files (*.pbl *.html)")
 		if fileName:
 			if self.maybeSave():
 				self.loadFile(fileName)
@@ -326,7 +326,7 @@ class MainWindow(QMainWindow):
 
 	def saveAs(self):
 		fileName, filtr = QFileDialog.getSaveFileName(self, "Save File", 
-				GenUtils.resource_path("files"), "PBL Files (*.pbl)")
+				GenUtils.resource_path("src/files"), "PBL Files (*.pbl)")
 		if fileName:
 			return self.saveFile(fileName)
 
@@ -476,7 +476,7 @@ class MainWindow(QMainWindow):
 
 		self.fontSizeCombo.setCurrentIndex(self.fontSizeCombo.findText(str(int(format.fontPointSize()))))
 		self.fontCombo.setCurrentIndex(self.fontCombo.findText(str(format.fontFamily())))
-		self.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('images/textpointer.png', format.foreground()))
+		self.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('src/images/textpointer.png', format.foreground()))
 
 	def updateIndentWidgets(self):
 		"""Responsible for updating indent widgets."""
@@ -525,7 +525,7 @@ class MainWindow(QMainWindow):
 
 	def textColorChanged(self):
 		newColor = QColor(self.sender().data())
-		self.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('images/textpointer.png', 
+		self.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('src/images/textpointer.png', 
 				newColor))
 		self.textButtonTriggered(newColor)
 
@@ -569,7 +569,6 @@ class MainWindow(QMainWindow):
 	def setTheme(self, themePath):
 		self.container.setObjectName("ThemeContainer")
 		self.container.setStyleSheet("QWidget#ThemeContainer { border-image: url(" + themePath + ");}")
-		print(themePath)
 
 		# Get the dominant colour from the theme image
 		NUM_CLUSTERS = 5
@@ -594,10 +593,11 @@ class MainWindow(QMainWindow):
 		self.statusBar.setStyleSheet(".QStatusBar { background-color: transparent; border: none; color: white;}")
 		self.nav_bar.setStyleSheet("QScrollArea { background-color: " + colour_hex + "; border: none; border-left: 1px solid white;}");
 
-def main():
+
+if __name__ == '__main__':
 
 	app = QApplication(sys.argv)
-	pixmap = QPixmap(GenUtils.resource_path("images/splash.png"))
+	pixmap = QPixmap(GenUtils.resource_path("src/images/splash.png"))
 	splash = QSplashScreen(pixmap)
 	splash.show()
 	app.processEvents()
