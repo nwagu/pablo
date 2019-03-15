@@ -7,5 +7,7 @@ Pablo is designed to be unobtrusive, does not get in your way
 
 You are Aladdin!
 
-To create an exe with pyinstaller, run the pablo.spec file like this
-`pyinstaller pablo.spec`
+### Build
+If you have Python 3.6 installed, you may quickly run the main.py file inside the src folder.
+
+<b>PyInstaller</b> is default for building a standalone application: run the pablo.spec file like this: `pyinstaller pablo.spec`
