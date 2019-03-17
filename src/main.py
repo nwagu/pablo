@@ -7,6 +7,7 @@ import scipy
 import scipy.misc
 import scipy.cluster
 
+from PBL.htmlcleaner import HTMLCleaner
 from views.pagedtextedit import PagedTextEdit
 from utils.colorutils import ColorUtils
 from utils.genutils import GenUtils
@@ -19,7 +20,7 @@ from PIL import Image
 
 main_windows = []
 LEFT_INDENT = 1; RIGHT_INDENT = 2; CENTER_INDENT = 3; JUSTIFY_INDENT = 4 # Constants
-m_theme = GenUtils.resource_path('src/themes/3.jpg')
+m_theme = GenUtils.resource_path('src/themes/7.jpg')
 
 def create_main_window(): # TODO this function should require a theme attribute
 	"""Creates a MainWindow."""
@@ -343,7 +344,6 @@ class MainWindow(QMainWindow):
 		QApplication.setOverrideCursor(Qt.WaitCursor)
 
 		if (QFileInfo(fileName).suffix() in ("pbl", "html")):
-			# TODO Write a custom QtextEdit.setPbl() function
 			self.paged_text_edit.setHtml(inFile.readAll())
 		else:
 			self.paged_text_edit.setPlainText(inFile.readAll())
@@ -364,9 +364,7 @@ class MainWindow(QMainWindow):
 		QApplication.setOverrideCursor(Qt.WaitCursor)
 
 		if (QFileInfo(fileName).suffix() in ("pbl", "html")):
-			# TODO Write a custom QtextEdit.toPbl() function
-			# FIXME: Once file is out of scope, the file is empty, instead of having text.
-			outFile << self.paged_text_edit.toHtml()
+			outFile << HTMLCleaner.clean(self.paged_text_edit.toHtml())
 		else:
 			outFile << self.paged_text_edit.toPlainText()
 		

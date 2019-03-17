@@ -10,7 +10,7 @@ Allow user to share their content with editors and receive feedback on it
 ## Custom file extension
 Develop the pbl file type based on xml. It is essentially going to be a watered down version of html
 
-## Implement tags with which user can go to certain portions of the document
+## Implement tags with which user can go to needed portions of the document
 
-## Build and text
-Build and test app for Linux and Mac OS X
+## Build and test
+Build and test this app on Linux and Mac OS X

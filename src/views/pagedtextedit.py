@@ -18,6 +18,7 @@ class PagedTextEdit(QTextEdit):
 
 	def __init__(self, *widget):
 		super(PagedTextEdit, self).__init__()
+		self.setAcceptRichText(True)
 		self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 		
 		# Configuring document change checking
@@ -290,5 +291,4 @@ class PagedTextEdit(QTextEdit):
 			rootFrameFormat.setRightMargin(rootFrameMargins.right())
 			rootFrameFormat.setBottomMargin(rootFrameMargins.bottom())
 			self.document().rootFrame().setFrameFormat(rootFrameFormat)
-
-	
+			
