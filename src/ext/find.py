@@ -6,7 +6,7 @@ from PySide2.QtCore import Qt
 import re
 
 class Find(QDialog):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
 
         QDialog.__init__(self, parent)
 
@@ -58,27 +58,27 @@ class Find(QDialog):
         # Layout the objects on the screen
         layout = QGridLayout()
 
-        layout.addWidget(self.findField,1,0,1,4)
-        layout.addWidget(self.normalRadio,2,2)
-        layout.addWidget(self.regexRadio,2,3)
-        layout.addWidget(findButton,2,0,1,2)
+        layout.addWidget(self.findField, 1, 0, 1, 4)
+        layout.addWidget(self.normalRadio, 2, 2)
+        layout.addWidget(self.regexRadio, 2, 3)
+        layout.addWidget(findButton, 2, 0, 1, 2)
 
-        layout.addWidget(self.replaceField,3,0,1,4)
-        layout.addWidget(replaceButton,4,0,1,2)
-        layout.addWidget(allButton,4,2,1,2)
+        layout.addWidget(self.replaceField, 3, 0, 1, 4)
+        layout.addWidget(replaceButton, 4, 0, 1, 2)
+        layout.addWidget(allButton, 4, 2, 1, 2)
 
         # Add some spacing
         spacer = QWidget(self)
 
-        spacer.setFixedSize(0,10)
+        spacer.setFixedSize(0, 10)
 
-        layout.addWidget(spacer,5,0)
+        layout.addWidget(spacer, 5, 0)
 
-        layout.addWidget(optionsLabel,6,0)
-        layout.addWidget(self.caseSens,6,1)
-        layout.addWidget(self.wholeWords,6,2)
+        layout.addWidget(optionsLabel, 6, 0)
+        layout.addWidget(self.caseSens, 6, 1)
+        layout.addWidget(self.wholeWords, 6, 2)
 
-        self.setGeometry(300,300,360,250)
+        self.setGeometry(300, 300, 360, 250)
         self.setWindowTitle("Find and Replace")
         self.setLayout(layout)
 
@@ -127,7 +127,6 @@ class Find(QDialog):
             self.moveCursor(start, end)
 
         else:
-
             # We set the cursor to the end if the search was unsuccessful
             self.parent.paged_text_edit.moveCursor(QTextCursor.End)
 

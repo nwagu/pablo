@@ -9,7 +9,7 @@ import scipy.cluster
 
 from PBL.htmlcleaner import HTMLCleaner
 from views.pagedtextedit import PagedTextEdit
-from ext.find import Find
+from ext import *
 from utils.colorutils import ColorUtils
 from utils.genutils import GenUtils
 
@@ -162,6 +162,8 @@ class MainWindow(QMainWindow):
 		self.edit_menu.addSeparator()
 		self.edit_menu.addAction(self.find_action)
 		self.edit_menu.addSeparator()
+		self.edit_menu.addAction(self.word_count_action)
+		self.edit_menu.addSeparator()
 		self.edit_menu.addAction(self.image_action)
 		
 		self.themes_menu.addAction(self.themes_action)
@@ -270,6 +272,7 @@ class MainWindow(QMainWindow):
 		self.themes_action = QAction(QIcon(GenUtils.resource_path('src/images/save.png')), "&Themes...", self, statusTip = "Themes", triggered = self.fontChange)
 		self.about_action = QAction(QIcon(GenUtils.resource_path('src/images/about.png')), 'A&bout', self, shortcut = QKeySequence(QKeySequence.HelpContents), triggered=self.about_pablo)
 		self.find_action = QAction(QIcon(GenUtils.resource_path('src/images/save.png')), '&Find', self, shortcut = QKeySequence(QKeySequence.Find), triggered=self._find)
+		self.word_count_action = QAction(QIcon(GenUtils.resource_path('src/images/save.png')), 'Word Count', self, shortcut = "Ctrl+W", triggered=self.showWordCount)
 		self.image_action = QAction(QIcon(GenUtils.resource_path('src/images/save.png')), 'I&mage', self, shortcut = "Ctrl+Shift+I", statusTip = "Insert image", triggered=self.insertImage)
 		
 
@@ -562,7 +565,8 @@ class MainWindow(QMainWindow):
 		return colorMenu
 
 	def _find(self):
-		Find(self).show
+		ff = find.Find(self)
+		ff.show()
 
 	def insertImage(self):
 
@@ -587,6 +591,11 @@ class MainWindow(QMainWindow):
 
 			cursor = self.paged_text_edit.textCursor()
 			cursor.insertImage(image, filename)
+
+	def showWordCount(self):
+		wc = wordcount.WordCount(self)
+		wc.getText()
+		wc.show()
 
 	def documentWasModified(self):
 		self.setWindowModified(self.paged_text_edit.document().isModified())
