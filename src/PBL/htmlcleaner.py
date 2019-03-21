@@ -7,8 +7,10 @@ from lxml import etree
 class HTMLCleaner():
 
     def clean(html):
-        pbl = html
-        pbl = pbl.replace('<html>', '<pbl>')
-        pbl = pbl.replace('</html>', '</pbl>')
+
+        root = etree.HTML(html)
+
+
+        pbl = etree.tostring(root, pretty_print=True, method="html")
 
         return pbl

@@ -344,7 +344,11 @@ class MainWindow(QMainWindow):
 		QApplication.setOverrideCursor(Qt.WaitCursor)
 
 		if (QFileInfo(fileName).suffix() in ("pbl", "html")):
+			# FIXME: Prevent double setting of the paged_text_edit where necessary
+			# FIXME: Double setting may cause bad UX with large files
 			self.paged_text_edit.setHtml(inFile.readAll())
+			cleanHtml = HTMLCleaner.clean(self.paged_text_edit.toHtml()).decode("utf-8")
+			self.paged_text_edit.setHtml(cleanHtml)
 		else:
 			self.paged_text_edit.setPlainText(inFile.readAll())
 
@@ -364,6 +368,7 @@ class MainWindow(QMainWindow):
 		QApplication.setOverrideCursor(Qt.WaitCursor)
 
 		if (QFileInfo(fileName).suffix() in ("pbl", "html")):
+			# outFile << self.paged_text_edit.toHtml()
 			outFile << HTMLCleaner.clean(self.paged_text_edit.toHtml())
 		else:
 			outFile << self.paged_text_edit.toPlainText()
