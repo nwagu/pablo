@@ -9,6 +9,7 @@ import scipy.cluster
 
 from PBL.htmlcleaner import HTMLCleaner
 from views.pagedtextedit import PagedTextEdit
+from ext.find import Find
 from utils.colorutils import ColorUtils
 from utils.genutils import GenUtils
 
@@ -157,6 +158,8 @@ class MainWindow(QMainWindow):
 		self.edit_menu.addAction(self.undo_action)
 		self.edit_menu.addAction(self.redo_action)
 		self.edit_menu.addSeparator()
+		self.edit_menu.addAction(self.find_action)
+		self.edit_menu.addSeparator()
 		self.edit_menu.addAction(self.select_all_action)
 		
 		self.themes_menu.addAction(self.themes_action)
@@ -264,6 +267,8 @@ class MainWindow(QMainWindow):
 		self.undo_action = QAction(QIcon(GenUtils.resource_path('src/images/undo.png')),"Undo", self, shortcut=QKeySequence.Undo, statusTip="Undo previous action", triggered=self.paged_text_edit.undo)
 		self.themes_action = QAction(QIcon(GenUtils.resource_path('src/images/save.png')), "&Themes...", self, statusTip = "Themes", triggered = self.fontChange)
 		self.about_action = QAction(QIcon(GenUtils.resource_path('src/images/about.png')), 'A&bout', self, shortcut = QKeySequence(QKeySequence.HelpContents), triggered=self.about_pablo)
+		self.find_action = QAction(QIcon(GenUtils.resource_path('src/images/about.png')), '&Find', self, shortcut = QKeySequence(QKeySequence.Find))
+		self.find_action.triggered.connect(Find(self).show)
 
 		# Actions grouped into tuples to ease display in navbar
 		self.edit_actions = (QAction(QIcon(GenUtils.resource_path('src/images/bold.png')), "Bold", self, checkable=True, shortcut=QKeySequence.Bold, triggered=self._bold),
@@ -343,7 +348,9 @@ class MainWindow(QMainWindow):
 		inFile = QTextStream(file)
 		QApplication.setOverrideCursor(Qt.WaitCursor)
 
-		if (QFileInfo(fileName).suffix() in ("pbl", "html")):
+		if (QFileInfo(fileName).suffix() in ("pbl")):
+			self.paged_text_edit.setHtml(inFile.readAll())
+		elif (QFileInfo(fileName).suffix() in ("html")):
 			# FIXME: Prevent double setting of the paged_text_edit where necessary
 			# FIXME: Double setting may cause bad UX with large files
 			self.paged_text_edit.setHtml(inFile.readAll())
