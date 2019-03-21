@@ -136,6 +136,8 @@ class Find(QDialog):
         # Grab the text cursor
         cursor = self.parent.paged_text_edit.textCursor()
 
+        # TODO Prevent replace from replacing text not searched for
+        # Check if cursor selection is same as search text
         # Security
         if self.lastMatch and cursor.hasSelection():
 

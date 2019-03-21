@@ -158,9 +158,11 @@ class MainWindow(QMainWindow):
 		self.edit_menu.addAction(self.undo_action)
 		self.edit_menu.addAction(self.redo_action)
 		self.edit_menu.addSeparator()
+		self.edit_menu.addAction(self.select_all_action)
+		self.edit_menu.addSeparator()
 		self.edit_menu.addAction(self.find_action)
 		self.edit_menu.addSeparator()
-		self.edit_menu.addAction(self.select_all_action)
+		self.edit_menu.addAction(self.image_action)
 		
 		self.themes_menu.addAction(self.themes_action)
 		self.about_menu.addAction(self.about_action)
@@ -267,8 +269,9 @@ class MainWindow(QMainWindow):
 		self.undo_action = QAction(QIcon(GenUtils.resource_path('src/images/undo.png')),"Undo", self, shortcut=QKeySequence.Undo, statusTip="Undo previous action", triggered=self.paged_text_edit.undo)
 		self.themes_action = QAction(QIcon(GenUtils.resource_path('src/images/save.png')), "&Themes...", self, statusTip = "Themes", triggered = self.fontChange)
 		self.about_action = QAction(QIcon(GenUtils.resource_path('src/images/about.png')), 'A&bout', self, shortcut = QKeySequence(QKeySequence.HelpContents), triggered=self.about_pablo)
-		self.find_action = QAction(QIcon(GenUtils.resource_path('src/images/about.png')), '&Find', self, shortcut = QKeySequence(QKeySequence.Find))
-		self.find_action.triggered.connect(Find(self).show)
+		self.find_action = QAction(QIcon(GenUtils.resource_path('src/images/save.png')), '&Find', self, shortcut = QKeySequence(QKeySequence.Find), triggered=self._find)
+		self.image_action = QAction(QIcon(GenUtils.resource_path('src/images/save.png')), 'I&mage', self, shortcut = "Ctrl+Shift+I", statusTip = "Insert image", triggered=self.insertImage)
+		
 
 		# Actions grouped into tuples to ease display in navbar
 		self.edit_actions = (QAction(QIcon(GenUtils.resource_path('src/images/bold.png')), "Bold", self, checkable=True, shortcut=QKeySequence.Bold, triggered=self._bold),
@@ -557,6 +560,33 @@ class MainWindow(QMainWindow):
 			if color == defaultColor:
 				colorMenu.setDefaultAction(action)
 		return colorMenu
+
+	def _find(self):
+		Find(self).show
+
+	def insertImage(self):
+
+		# Get image file name
+		filename = QFileDialog.getOpenFileName(self, 
+					'Insert image',".","Images (*.png *.xpm *.jpg *.bmp *.gif)")[0]
+
+		# Create image object
+		image = QImage(filename)
+
+		# Error if unloadable
+		if image.isNull():
+
+			popup = QMessageBox(QMessageBox.Critical,
+									"Image load error",
+									"Could not load image file!",
+									QMessageBox.Ok,
+									self)
+			popup.show()
+
+		else:
+
+			cursor = self.paged_text_edit.textCursor()
+			cursor.insertImage(image, filename)
 
 	def documentWasModified(self):
 		self.setWindowModified(self.paged_text_edit.document().isModified())
