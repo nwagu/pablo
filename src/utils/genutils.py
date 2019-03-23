@@ -16,3 +16,4 @@ class GenUtils:
 
 	def count_words(text):
 		return (str(len(text.split())), str(len(text)))
+		

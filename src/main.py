@@ -1,5 +1,5 @@
 
-import sys
+import os, sys
 
 import time
 import struct
@@ -22,7 +22,7 @@ from PIL import Image
 
 main_windows = []
 LEFT_INDENT = 1; RIGHT_INDENT = 2; CENTER_INDENT = 3; JUSTIFY_INDENT = 4 # Constants
-m_theme = GenUtils.resource_path('src/themes/7.jpg')
+m_theme = GenUtils.resource_path('src/themes/13.jpg')
 
 def create_main_window(): # TODO this function should require a theme attribute
 	"""Creates a MainWindow."""
@@ -32,39 +32,6 @@ def create_main_window(): # TODO this function should require a theme attribute
 	main_windows.append(main_win)
 	main_win.show()
 	return main_win
-
-class NavBar(QScrollArea):
-
-	CURRENT_TAB = 0
-	
-	def __init__(self):
-		super(NavBar, self).__init__()
-		
-		self.setFixedWidth(200)
-		sizePolicy = QSizePolicy()
-		sizePolicy.setVerticalPolicy(QSizePolicy.Expanding)
-		sizePolicy.setHorizontalPolicy(QSizePolicy.Maximum)
-		self.setSizePolicy(sizePolicy)
-		self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-		self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-
-		self.wid = QWidget()
-		self.wid.setStyleSheet(".QWidget {background-color: transparent; border: none;}")
-		self.vLayout = QVBoxLayout(self.wid)
-		self.vLayout.setAlignment(Qt.AlignTop | Qt.AlignCenter)
-		self.vLayout.setMargin(0)
-		self.setWidgetResizable(True)
-		self.setWidget(self.wid)
-		self.wid.setLayout(self.vLayout)
-		
-	def addComponent(self, component):
-		self.vLayout.addWidget(component)
-		component.setObjectName("barComp")
-		component.setStyleSheet("QWidget#barComp { margin-bottom: 20px; margin-top: 20px }")
-
-	def clearNavBar(self):
-		while(self.vLayout.count() != 0):
-			self.vLayout.takeAt(0).widget().setParent(None)
 		
 
 class MainWindow(QMainWindow):
@@ -104,8 +71,8 @@ class MainWindow(QMainWindow):
 		self.paged_text_edit.setUsePageMode(True)
 		self.paged_text_edit.setPageNumbersAlignment(Qt.AlignBottom | Qt.AlignCenter)
 
-		self.nav_bar = NavBar()
-		self.nav_bar.setVisible(False)
+		self.nav_bar = navbar.NavBar()
+		# self.nav_bar.setVisible(False)
 
 		self.text_edit_layout = QHBoxLayout()
 		self.text_edit_layout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
@@ -177,11 +144,8 @@ class MainWindow(QMainWindow):
 	def formatNav(self):
 		if(self.nav_bar.CURRENT_TAB != 1):
 			self.nav_bar.clearNavBar()
-			self.nav_bar.addComponent(self.fontCombo)
-			self.nav_bar.addComponent(self.fontSizeCombo)
-			self.nav_bar.addComponent(self.fontColorToolButton)
-			self.nav_bar.addComponent(self.editBar)
-			self.nav_bar.addComponent(self.indentBar)
+			for view in self.format_widgets:
+				self.nav_bar.addComponent(view)
 			self.nav_bar.CURRENT_TAB = 1
 
 			if(not self.nav_bar.isVisible()):
@@ -189,10 +153,10 @@ class MainWindow(QMainWindow):
 		else:
 			self.nav_bar.setVisible(not self.nav_bar.isVisible())
 
-	def sectionNav(self):
+	def sectionsNav(self):
 		if(self.nav_bar.CURRENT_TAB != 2):
 			self.nav_bar.clearNavBar()
-			self.nav_bar.addComponent(self.pageScaleCombo)
+
 			self.nav_bar.CURRENT_TAB = 2
 
 			if(not self.nav_bar.isVisible()):
@@ -203,7 +167,8 @@ class MainWindow(QMainWindow):
 	def themesNav(self):
 		if(self.nav_bar.CURRENT_TAB != 3):
 			self.nav_bar.clearNavBar()
-			# self.nav_bar.addComponent(self.pageScaleCombo)
+			for view in self.theme_thumbs:
+				self.nav_bar.addComponent(view)
 			self.nav_bar.CURRENT_TAB = 3
 
 			if(not self.nav_bar.isVisible()):
@@ -212,50 +177,84 @@ class MainWindow(QMainWindow):
 			self.nav_bar.setVisible(not self.nav_bar.isVisible())
 
 	def _create_nav_widgets(self):
-		self.fontCombo = QFontComboBox()
-		self.fontCombo.currentFontChanged.connect(self._fontFamily)
-		
-		
-		self.fontSizeCombo = QComboBox()
-		self.fontSizeCombo.setEditable(True)
-		for i in range(8, 30, 2):
-			self.fontSizeCombo.addItem(str(i))
-		validator = QIntValidator(2, 64, self)
-		self.fontSizeCombo.setValidator(validator)
-		self.fontSizeCombo.currentIndexChanged.connect(self._fontSize)
-		
-		self.fontColorToolButton = QToolButton()
-		self.fontColorToolButton.setPopupMode(QToolButton.MenuButtonPopup)
-		self.fontColorToolButton.setMenu(self.createColorMenu(self.textColorChanged, Qt.black))
-		# self.textAction = self.fontColorToolButton.menu().defaultAction()
-		self.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('src/images/textpointer.png', Qt.black))
-		# FIXME parameter is set to bool; get selected menu color and parse as argument
-		self.fontColorToolButton.clicked.connect(self.textButtonTriggered)
-		
-		self.pageScaleCombo = QComboBox()
-		self.pageScaleCombo.addItems(["50%", "75%", "100%", "125%", "150%"])
-		self.pageScaleCombo.setCurrentIndex(2)
-		self.pageScaleCombo.currentIndexChanged[str].connect(self.pageScaleChanged)
 
-		self.editBar = QWidget()
-		editLay = QHBoxLayout(self.editBar)
+		# TODO Use dict instead of list
+		self.format_widgets = []
+		# TODO self.sections_thumbs = []
+		self.theme_thumbs = []
+
+		fontCombo = QFontComboBox()
+		fontCombo.currentFontChanged.connect(self._fontFamily)
+		
+		fontSizeCombo = QComboBox()
+		fontSizeCombo.setEditable(True)
+		for i in range(8, 30, 2):
+			fontSizeCombo.addItem(str(i))
+		validator = QIntValidator(2, 64, self)
+		fontSizeCombo.setValidator(validator)
+		fontSizeCombo.currentIndexChanged.connect(self._fontSize)
+		
+		fontColorToolButton = QToolButton()
+		fontColorToolButton.setPopupMode(QToolButton.MenuButtonPopup)
+		fontColorToolButton.setMenu(self.createColorMenu(self.textColorChanged, Qt.black))
+		# self.textAction = fontColorToolButton.menu().defaultAction()
+		fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('src/images/textpointer.png', Qt.black))
+		# FIXME parameter is set to bool; get selected menu color and parse as argument
+		fontColorToolButton.clicked.connect(self.textButtonTriggered)
+		
+		pageScaleCombo = QComboBox()
+		pageScaleCombo.addItems(["50%", "75%", "100%", "125%", "150%"])
+		pageScaleCombo.setCurrentIndex(2)
+		pageScaleCombo.currentIndexChanged[str].connect(self.pageScaleChanged)
+
+		editBar = QWidget()
+		editLay = QHBoxLayout(editBar)
 		editLay.setSizeConstraint(QLayout.SetFixedSize)
 		for action in self.edit_actions:
 			self.addAction(action) # prevents action from being disabled when navbar is hidden
 			button = QToolButton()
 			button.setDefaultAction(action)
 			editLay.addWidget(button)
-		self.editBar.setLayout(editLay)
+		editBar.setLayout(editLay)
 
-		self.indentBar = QWidget()
-		indentLay = QHBoxLayout(self.indentBar)
+		indentBar = QWidget()
+		indentLay = QHBoxLayout(indentBar)
 		indentLay.setSizeConstraint(QLayout.SetFixedSize)
 		for action in self.indent_actions:
 			self.addAction(action) # prevents action from being disabled when navbar is hidden
 			button = QToolButton()
 			button.setDefaultAction(action)
 			indentLay.addWidget(button)
-		self.indentBar.setLayout(indentLay)
+		indentBar.setLayout(indentLay)
+
+		self.format_widgets.append(fontCombo)
+		self.format_widgets.append(fontSizeCombo)
+		self.format_widgets.append(fontColorToolButton)
+		self.format_widgets.append(pageScaleCombo)
+		self.format_widgets.append(editBar)
+		self.format_widgets.append(indentBar)
+
+
+		# for Theme thumbnails
+		themedir = 'src/themes'
+		for theme in os.listdir(themedir):
+			rel_path = GenUtils.resource_path(os.path.join(themedir, theme))
+			if os.path.isfile(rel_path):
+				im = Image.open(rel_path)
+				im.thumbnail((360, 360), Image.ANTIALIAS)
+
+				# Convert PIL Image to QImage. The PIL ImageQT class failed to do this for me
+				im = im.convert("RGBA")
+				data = im.tobytes('raw', "RGBA")
+				qim = QImage(data, im.size[0], im.size[1], QImage.Format_ARGB32)
+
+				pixmap = QPixmap.fromImage(qim)
+				theme_view = themelabel.ThemeLabel()
+				theme_view.setPixmap(pixmap)
+				theme_view.clicked.connect(lambda tp=rel_path: self.setTheme(tp))
+
+				self.theme_thumbs.append(theme_view)
+
 
 	def _create_actions(self):
 		self.new_action  = QAction(QIcon(GenUtils.resource_path('src/images/new.png')), "&New", self, shortcut=QKeySequence.New, statusTip="Create a New File", triggered=self.newFile)
@@ -289,7 +288,7 @@ class MainWindow(QMainWindow):
 		
 		# Side toolbar actions...
 		self.main_format_action = QAction(QIcon(GenUtils.resource_path('src/images/arrow.png')), "&Format", self, statusTip = "Format", triggered=self.formatNav)
-		self.main_sections_action = QAction(QIcon(GenUtils.resource_path('src/images/palm.png')), "&Sections", self, statusTip = "Sections", triggered=self.sectionNav)
+		self.main_sections_action = QAction(QIcon(GenUtils.resource_path('src/images/attach.png')), "&Sections", self, statusTip = "Sections", triggered=self.sectionsNav)
 		self.main_themes_action = QAction(QIcon(GenUtils.resource_path('src/images/theme.png')), "&Themes", self, statusTip = "Themes", triggered=self.themesNav)
 		
 		self.cut_action.setEnabled(False)
@@ -479,12 +478,12 @@ class MainWindow(QMainWindow):
 		
 	def _fontFamily(self):
 		format = QTextCharFormat()
-		format.setFontFamily(self.fontCombo.currentFont().family())
+		format.setFontFamily(self.format_widgets[0].currentFont().family())
 		self.paged_text_edit.mergeCurrentCharFormat(format)
 
 	def _fontSize(self):
 		format = QTextCharFormat()
-		format.setFontPointSize(int(self.fontSizeCombo.currentText()))
+		format.setFontPointSize(int(self.format_widgets[1].currentText()))
 		self.paged_text_edit.mergeCurrentCharFormat(format)
 
 	@Slot(QTextCharFormat)
@@ -496,9 +495,9 @@ class MainWindow(QMainWindow):
 		self.edit_actions[1].setChecked(format.fontItalic())
 		self.edit_actions[2].setChecked(format.fontUnderline())
 
-		self.fontSizeCombo.setCurrentIndex(self.fontSizeCombo.findText(str(int(format.fontPointSize()))))
-		self.fontCombo.setCurrentIndex(self.fontCombo.findText(str(format.fontFamily())))
-		self.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('src/images/textpointer.png', format.foreground()))
+		self.format_widgets[1].setCurrentIndex(self.format_widgets[1].findText(str(int(format.fontPointSize()))))
+		self.format_widgets[0].setCurrentIndex(self.format_widgets[0].findText(str(format.fontFamily())))
+		self.format_widgets[2].setIcon(ColorUtils.createColorToolButtonIcon('src/images/textpointer.png', format.foreground()))
 
 	def updateIndentWidgets(self):
 		"""Responsible for updating indent widgets."""
@@ -547,7 +546,7 @@ class MainWindow(QMainWindow):
 
 	def textColorChanged(self):
 		newColor = QColor(self.sender().data())
-		self.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('src/images/textpointer.png', 
+		self.format_widgets[2].setIcon(ColorUtils.createColorToolButtonIcon('src/images/textpointer.png', 
 				newColor))
 		self.textButtonTriggered(newColor)
 
@@ -634,7 +633,7 @@ class MainWindow(QMainWindow):
 		# Get the dominant colour from the theme image
 		NUM_CLUSTERS = 5
 		im = Image.open(themePath)
-		im = im.resize((150, 150))  # optional, to reduce time
+		im = im.resize((50, 50))  # optional, to reduce time
 		ar = np.asarray(im)
 		shape = ar.shape
 		ar = ar.reshape(scipy.product(shape[:2]), shape[2]).astype(float)
@@ -648,10 +647,10 @@ class MainWindow(QMainWindow):
 		peak = codes[index_max]
 		colour_hex = '#%02x%02x%02x' % tuple(int(i) for i in peak)
 
-		self.setStyleSheet("QMainWindow { background-color: " + colour_hex + " }");
+		self.setStyleSheet("QMainWindow { background-color: " + colour_hex + " }")
 		self.main_tool_bar.setStyleSheet(".QToolBar { background-color: transparent; border: none; } .QToolButton { margin-bottom: 10px; margin-top: 10px; } ")
 		self.statusBar.setStyleSheet(".QStatusBar { background-color: transparent; border: none; color: white;}")
-		self.nav_bar.setStyleSheet("QScrollArea { background-color: " + colour_hex + "; border: none; border-left: 1px solid white;}");
+		self.nav_bar.setStyleSheet("QScrollArea { background-color: " + colour_hex  + " ; border: none; border-left: 1px solid white;}")
 
 
 if __name__ == '__main__':

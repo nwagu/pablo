@@ -1,1 +1,1 @@
-__all__ = ["pagedtextedit", "clickablelabel"]
+__all__ = ["pagedtextedit", "navbar", "clickablelabel", "themelabel"]
