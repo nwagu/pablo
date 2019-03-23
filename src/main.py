@@ -9,7 +9,7 @@ import scipy.misc
 import scipy.cluster
 
 from PBL.htmlcleaner import HTMLCleaner
-from views.pagedtextedit import PagedTextEdit
+from views import *
 from ext import *
 from utils.colorutils import ColorUtils
 from utils.genutils import GenUtils
@@ -87,7 +87,7 @@ class MainWindow(QMainWindow):
 
 		self.container = QWidget()
 
-		self.paged_text_edit = PagedTextEdit(self.container)
+		self.paged_text_edit = pagedtextedit.PagedTextEdit(self.container)
 		# The textedit must be transparent; the white pages are painted in paintEvent() function
 		self.paged_text_edit.setStyleSheet("QTextEdit { background-color: transparent }")
 
@@ -316,9 +316,12 @@ class MainWindow(QMainWindow):
 
 	def _create_status_bar(self):
 		self.statusBar = QStatusBar()
-		self.wordCountLabel = QLabel()
+		self.wordCountLabel = clickablelabel.ClickableLabel()
+		self.wordCountLabel.clicked.connect(self.word_count_action.triggered.emit)
 		self.statusBar.addPermanentWidget(self.wordCountLabel)
-		self.pageInfoStatusLabel = QLabel()
+		
+		self.pageInfoStatusLabel = clickablelabel.ClickableLabel()
+		# self.wordCountLabel.clicked.connect(TODO)
 		self.statusBar.addPermanentWidget(self.pageInfoStatusLabel)
 
 	def newFile(self):
