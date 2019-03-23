@@ -316,6 +316,8 @@ class MainWindow(QMainWindow):
 
 	def _create_status_bar(self):
 		self.statusBar = QStatusBar()
+		self.wordCountLabel = QLabel()
+		self.statusBar.addPermanentWidget(self.wordCountLabel)
 		self.pageInfoStatusLabel = QLabel()
 		self.statusBar.addPermanentWidget(self.pageInfoStatusLabel)
 
@@ -600,6 +602,7 @@ class MainWindow(QMainWindow):
 
 	def documentWasModified(self):
 		self.setWindowModified(self.paged_text_edit.document().isModified())
+		self.updateWordCount()
 
 	def about_pablo(self):
 		QMessageBox.about(self, "About Pablo",
@@ -610,8 +613,13 @@ class MainWindow(QMainWindow):
 	@Slot(tuple)
 	def readPageInfo(self, pageInfo):
 		self.curPage = pageInfo
-		pageMessage = str(pageInfo[0]) + " / " + str(pageInfo[1]) + "    "
+		pageMessage = "  " + str(pageInfo[0]) + " / " + str(pageInfo[1]) + "    "
 		self.pageInfoStatusLabel.setText(pageMessage)
+
+	def updateWordCount(self):
+		count = GenUtils.count_words(self.paged_text_edit.toPlainText())
+		wordCountInfo = count[0] + " words;  " + count[1] + " symbols   "
+		self.wordCountLabel.setText(wordCountInfo)
 
 	def printMessageOnStatus(self, message, timeout=5000):                                                   
 		self.statusBar.showMessage(message, timeout)

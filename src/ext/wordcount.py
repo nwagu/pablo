@@ -1,5 +1,6 @@
 
 from PySide2.QtWidgets import QWidget, QLabel, QDialog, QGridLayout
+from utils.genutils import GenUtils
 
 import re
 
@@ -66,24 +67,12 @@ class WordCount(QDialog):
 
         # Get the text currently in selection
         text = self.parent.paged_text_edit.textCursor().selectedText()
+        count = GenUtils.count_words(text)
+        self.currentWords.setText(count[0])
+        self.currentSymbols.setText(count[1])
 
-        # Split the text to get the word count
-        words = str(len(text.split()))
-
-        # And just get the length of the text for the symbols
-        # count
-        symbols = str(len(text))
-
-        self.currentWords.setText(words)
-        self.currentSymbols.setText(symbols)
-
-        # For the total count, same thing as above but for the
-        # total text
-
+        # For the total count...
         text = self.parent.paged_text_edit.toPlainText()
-
-        words = str(len(text.split()))
-        symbols = str(len(text))
-
-        self.totalWords.setText(words)
-        self.totalSymbols.setText(symbols)
+        count = GenUtils.count_words(text)
+        self.totalWords.setText(count[0])
+        self.totalSymbols.setText(count[1])
