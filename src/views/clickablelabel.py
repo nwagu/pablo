@@ -8,6 +8,8 @@ class ClickableLabel(QLabel):
 
     def __init__(self, *args):
         super().__init__(*args)
+        self.setStyleSheet(" color: white; font-weight: 800; ")
+		
 
     def mousePressEvent(self, event):
         self.clicked.emit()

@@ -650,7 +650,6 @@ class MainWindow(QMainWindow):
 
 		self.setStyleSheet("QMainWindow { background-color: " + colour_hex + " }");
 		self.main_tool_bar.setStyleSheet(".QToolBar { background-color: transparent; border: none; } .QToolButton { margin-bottom: 10px; margin-top: 10px; } ")
-		self.pageInfoStatusLabel.setStyleSheet(".QLabel { color: white; font-weight: 800; }")
 		self.statusBar.setStyleSheet(".QStatusBar { background-color: transparent; border: none; color: white;}")
 		self.nav_bar.setStyleSheet("QScrollArea { background-color: " + colour_hex + "; border: none; border-left: 1px solid white;}");
 
