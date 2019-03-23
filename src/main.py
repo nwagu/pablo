@@ -1,6 +1,7 @@
 
 import sys
 
+import time
 import struct
 import numpy as np
 import scipy
@@ -647,10 +648,20 @@ if __name__ == '__main__':
 
 	app = QApplication(sys.argv)
 	pixmap = QPixmap(GenUtils.resource_path("src/images/splash.png"))
-	splash = QSplashScreen(pixmap)
+	splash = QSplashScreen(pixmap, Qt.WindowStaysOnTopHint)
+
+	progressBar = QProgressBar(splash)
+	splash.setMask(pixmap.mask())
 	splash.show()
+	for i in range(0, 100):
+		progressBar.setValue(i)
+		t = time.time()
+		while time.time() < t + 0.01:
+			app.processEvents()
+
 	app.processEvents()
 
 	main_win = create_main_window()
+	splash.finish(main_win)
 	exit_code = app.exec_()
 	sys.exit(exit_code)
