@@ -1,11 +1,11 @@
 
-import math
+# import math
 
 from PySide2.QtCore import Qt, Signal, QPoint, QSize
 from PySide2.QtGui import QPainter, QPixmap
 from PySide2.QtWidgets import QWidget, QLabel, QSizePolicy
 
-class ThemeLabel(QWidget):
+class ThemeLabel(QLabel):
 	""" A Label for themes in the navbar.
 	It emits a signal when clicked. """
 
@@ -16,33 +16,32 @@ class ThemeLabel(QWidget):
 		super().__init__(*args)
 		self.setFixedWidth(200)
 		sizePolicy = QSizePolicy()
-		sizePolicy.setVerticalPolicy(QSizePolicy.MinimumExpanding)
-		sizePolicy.setHorizontalPolicy(QSizePolicy.Fixed)
+		sizePolicy.setHorizontalPolicy(QSizePolicy.Maximum)
+		sizePolicy.setVerticalPolicy(QSizePolicy.Expanding)
 		self.setSizePolicy(sizePolicy)
 		self.hasHeightForWidth()
 
 		self.pix  = QPixmap()
-		self._heightForWidthFactor = 1.0
+		# self._heightForWidthFactor = 1.0
 
 	def hasHeightForWidth(self):
 		return True
 
 	def heightForWidth(self, width):
-		return math.ceil(width / 2)
+		if(self.pixmap()):
+			return int(width * self.pixmap().height() / self.pixmap().width())
+		else:
+			return width
 	
 
 	def paintEvent(self, _event):
 		if(not self.pix):
 			return
 			
-		painter = QPainter(self);
-		painter.setRenderHint(QPainter.Antialiasing);
+		painter = QPainter(self)
+		painter.setRenderHint(QPainter.Antialiasing)
 
-		pixSize = self.pix.size();
-		pixSize.scale(_event.rect().size(), Qt.KeepAspectRatio);
-
-		scaledPix = self.pix.scaled(pixSize, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-
+		scaledPix = self.pixmap().scaledToWidth(_event.rect().width())
 		painter.drawPixmap(QPoint(), scaledPix)
 
 		super().paintEvent(_event)
