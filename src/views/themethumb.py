@@ -1,12 +1,10 @@
 
-# import math
-
 from PySide2.QtCore import Qt, Signal, QPoint, QSize
 from PySide2.QtGui import QPainter, QPixmap
-from PySide2.QtWidgets import QWidget, QLabel, QSizePolicy
+from PySide2.QtWidgets import QWidget, QSizePolicy
 
-class ThemeLabel(QLabel):
-	""" A Label for themes in the navbar.
+class ThemeThumb(QWidget):
+	""" A widget for themes in the navbar.
 	It emits a signal when clicked. """
 
 	clicked = Signal()

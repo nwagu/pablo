@@ -2,11 +2,6 @@
 import os, sys
 
 import time
-import struct
-import numpy as np
-import scipy
-import scipy.misc
-import scipy.cluster
 
 from PBL.htmlcleaner import HTMLCleaner
 from views import *
@@ -52,7 +47,7 @@ class MainWindow(QMainWindow):
 		# self.resize(available_geometry.width(), available_geometry.height())
 		self.readSettings()
 
-		self.container = QWidget()
+		self.container = dropview.DropView()
 
 		self.paged_text_edit = pagedtextedit.PagedTextEdit(self.container)
 		# The textedit must be transparent; the white pages are painted in paintEvent() function
@@ -71,12 +66,12 @@ class MainWindow(QMainWindow):
 		self.paged_text_edit.setUsePageMode(True)
 		self.paged_text_edit.setPageNumbersAlignment(Qt.AlignBottom | Qt.AlignCenter)
 
-		self.nav_bar = navbar.NavBar()
-		# self.nav_bar.setVisible(False)
+		self.nav_panel = navpanel.NavPanel(self)
+		self.nav_panel.setVisible(False)
 
 		self.text_edit_layout = QHBoxLayout()
 		self.text_edit_layout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
-		self.text_edit_layout.addWidget(self.nav_bar)
+		self.text_edit_layout.addWidget(self.nav_panel)
 		self.text_edit_layout.setMargin(0)
 		self.paged_text_edit.setLayout(self.text_edit_layout)
 
@@ -88,11 +83,14 @@ class MainWindow(QMainWindow):
 		self.paged_text_edit.document().setUndoRedoEnabled(False)
 		self.paged_text_edit.document().setUndoRedoEnabled(True)
 
-		self.layout = QHBoxLayout()
-		self.layout.addWidget(self.paged_text_edit)
-		self.layout.setMargin(0)
-		self.container.setLayout(self.layout)
+		# self.layout = QHBoxLayout()
+		# self.layout.addWidget(self.paged_text_edit)
+		# self.layout.setMargin(0)
+		# self.container.setLayout(self.layout)
 		self.setCentralWidget(self.container)
+
+		self.container.addWidget(self.paged_text_edit)
+		self.container.setCurrentWidget(self.paged_text_edit)
 
 		self.setCurrentFile('')
 		self.paged_text_edit.document().contentsChanged.connect(self.documentWasModified)
@@ -104,7 +102,6 @@ class MainWindow(QMainWindow):
 		self._create_actions()
 		self._create_tool_bar()
 		self._create_status_bar()
-		self._create_nav_widgets()
 
 		self.setStatusBar(self.statusBar)
 		self.printMessageOnStatus("Ready", 10000)
@@ -141,120 +138,11 @@ class MainWindow(QMainWindow):
 		self.main_tool_bar.addAction(self.main_sections_action)
 		self.main_tool_bar.addAction(self.main_themes_action)
 
-	def formatNav(self):
-		if(self.nav_bar.CURRENT_TAB != 1):
-			self.nav_bar.clearNavBar()
-			for view in self.format_widgets:
-				self.nav_bar.addComponent(view)
-			self.nav_bar.CURRENT_TAB = 1
-
-			if(not self.nav_bar.isVisible()):
-				self.nav_bar.setVisible(True)
+	def navSelectorClicked(self, page):
+		if(self.nav_panel.setCurrentPage(page)):
+			pass
 		else:
-			self.nav_bar.setVisible(not self.nav_bar.isVisible())
-
-	def sectionsNav(self):
-		if(self.nav_bar.CURRENT_TAB != 2):
-			self.nav_bar.clearNavBar()
-
-			self.nav_bar.CURRENT_TAB = 2
-
-			if(not self.nav_bar.isVisible()):
-				self.nav_bar.setVisible(True)
-		else:
-			self.nav_bar.setVisible(not self.nav_bar.isVisible())
-
-	def themesNav(self):
-		if(self.nav_bar.CURRENT_TAB != 3):
-			self.nav_bar.clearNavBar()
-			for view in self.theme_thumbs:
-				self.nav_bar.addComponent(view)
-			self.nav_bar.CURRENT_TAB = 3
-
-			if(not self.nav_bar.isVisible()):
-				self.nav_bar.setVisible(True)
-		else:
-			self.nav_bar.setVisible(not self.nav_bar.isVisible())
-
-	def _create_nav_widgets(self):
-
-		# TODO Use dict instead of list
-		self.format_widgets = []
-		# TODO self.sections_thumbs = []
-		self.theme_thumbs = []
-
-		fontCombo = QFontComboBox()
-		fontCombo.currentFontChanged.connect(self._fontFamily)
-		
-		fontSizeCombo = QComboBox()
-		fontSizeCombo.setEditable(True)
-		for i in range(8, 30, 2):
-			fontSizeCombo.addItem(str(i))
-		validator = QIntValidator(2, 64, self)
-		fontSizeCombo.setValidator(validator)
-		fontSizeCombo.currentIndexChanged.connect(self._fontSize)
-		
-		fontColorToolButton = QToolButton()
-		fontColorToolButton.setPopupMode(QToolButton.MenuButtonPopup)
-		fontColorToolButton.setMenu(self.createColorMenu(self.textColorChanged, Qt.black))
-		# self.textAction = fontColorToolButton.menu().defaultAction()
-		fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('src/images/textpointer.png', Qt.black))
-		# FIXME parameter is set to bool; get selected menu color and parse as argument
-		fontColorToolButton.clicked.connect(self.textButtonTriggered)
-		
-		pageScaleCombo = QComboBox()
-		pageScaleCombo.addItems(["50%", "75%", "100%", "125%", "150%"])
-		pageScaleCombo.setCurrentIndex(2)
-		pageScaleCombo.currentIndexChanged[str].connect(self.pageScaleChanged)
-
-		editBar = QWidget()
-		editLay = QHBoxLayout(editBar)
-		editLay.setSizeConstraint(QLayout.SetFixedSize)
-		for action in self.edit_actions:
-			self.addAction(action) # prevents action from being disabled when navbar is hidden
-			button = QToolButton()
-			button.setDefaultAction(action)
-			editLay.addWidget(button)
-		editBar.setLayout(editLay)
-
-		indentBar = QWidget()
-		indentLay = QHBoxLayout(indentBar)
-		indentLay.setSizeConstraint(QLayout.SetFixedSize)
-		for action in self.indent_actions:
-			self.addAction(action) # prevents action from being disabled when navbar is hidden
-			button = QToolButton()
-			button.setDefaultAction(action)
-			indentLay.addWidget(button)
-		indentBar.setLayout(indentLay)
-
-		self.format_widgets.append(fontCombo)
-		self.format_widgets.append(fontSizeCombo)
-		self.format_widgets.append(fontColorToolButton)
-		self.format_widgets.append(pageScaleCombo)
-		self.format_widgets.append(editBar)
-		self.format_widgets.append(indentBar)
-
-
-		# for Theme thumbnails
-		themedir = 'src/themes'
-		for theme in os.listdir(themedir):
-			rel_path = GenUtils.resource_path(os.path.join(themedir, theme))
-			if os.path.isfile(rel_path):
-				im = Image.open(rel_path)
-				im.thumbnail((360, 360), Image.ANTIALIAS)
-
-				# Convert PIL Image to QImage. The PIL ImageQT class failed to do this for me
-				im = im.convert("RGBA")
-				data = im.tobytes('raw', "RGBA")
-				qim = QImage(data, im.size[0], im.size[1], QImage.Format_ARGB32)
-
-				pixmap = QPixmap.fromImage(qim)
-				theme_view = themelabel.ThemeLabel()
-				theme_view.setPixmap(pixmap)
-				theme_view.clicked.connect(lambda tp=rel_path: self.setTheme(tp))
-
-				self.theme_thumbs.append(theme_view)
-
+			self.nav_panel.toggleVisibility()
 
 	def _create_actions(self):
 		self.new_action  = QAction(QIcon(GenUtils.resource_path('src/images/new.png')), "&New", self, shortcut=QKeySequence.New, statusTip="Create a New File", triggered=self.newFile)
@@ -287,9 +175,9 @@ class MainWindow(QMainWindow):
 
 		
 		# Side toolbar actions...
-		self.main_format_action = QAction(QIcon(GenUtils.resource_path('src/images/arrow.png')), "&Format", self, statusTip = "Format", triggered=self.formatNav)
-		self.main_sections_action = QAction(QIcon(GenUtils.resource_path('src/images/attach.png')), "&Sections", self, statusTip = "Sections", triggered=self.sectionsNav)
-		self.main_themes_action = QAction(QIcon(GenUtils.resource_path('src/images/theme.png')), "&Themes", self, statusTip = "Themes", triggered=self.themesNav)
+		self.main_format_action = QAction(QIcon(GenUtils.resource_path('src/images/arrow.png')), "&Format", self, statusTip = "Format", triggered=(lambda page=1: self.navSelectorClicked(page)))
+		self.main_sections_action = QAction(QIcon(GenUtils.resource_path('src/images/attach.png')), "&Sections", self, statusTip = "Sections", triggered=(lambda page=2: self.navSelectorClicked(page)))
+		self.main_themes_action = QAction(QIcon(GenUtils.resource_path('src/images/theme.png')), "&Themes", self, statusTip = "Themes", triggered=(lambda page=3: self.navSelectorClicked(page)))
 		
 		self.cut_action.setEnabled(False)
 		self.copy_action.setEnabled(False)
@@ -627,30 +515,15 @@ class MainWindow(QMainWindow):
 		self.statusBar.showMessage(message, timeout)
 
 	def setTheme(self, themePath):
-		self.container.setObjectName("ThemeContainer")
-		self.container.setStyleSheet("QWidget#ThemeContainer { border-image: url(" + themePath + ");}")
 
-		# Get the dominant colour from the theme image
-		NUM_CLUSTERS = 5
-		im = Image.open(themePath)
-		im = im.resize((50, 50))  # optional, to reduce time
-		ar = np.asarray(im)
-		shape = ar.shape
-		ar = ar.reshape(scipy.product(shape[:2]), shape[2]).astype(float)
+		self.container.dropImage(themePath)
 
-		codes, dist = scipy.cluster.vq.kmeans(ar, NUM_CLUSTERS)
+		mainColorHex = ColorUtils.getDominantColorFromImage(Image.open(themePath))
 
-		vecs, dist = scipy.cluster.vq.vq(ar, codes)         # assign codes
-		counts, bins = scipy.histogram(vecs, len(codes))    # count occurrences
-
-		index_max = scipy.argmax(counts)                    # find most frequent
-		peak = codes[index_max]
-		colour_hex = '#%02x%02x%02x' % tuple(int(i) for i in peak)
-
-		self.setStyleSheet("QMainWindow { background-color: " + colour_hex + " }")
+		self.setStyleSheet("QMainWindow { background-color: " + mainColorHex + " }")
 		self.main_tool_bar.setStyleSheet(".QToolBar { background-color: transparent; border: none; } .QToolButton { margin-bottom: 10px; margin-top: 10px; } ")
 		self.statusBar.setStyleSheet(".QStatusBar { background-color: transparent; border: none; color: white;}")
-		self.nav_bar.setStyleSheet("QScrollArea { background-color: " + colour_hex  + " ; border: none; border-left: 1px solid white;}")
+		self.nav_panel.setStyleSheet("QScrollArea { background-color: " + mainColorHex  + "ca ; border: none; border-left: 1px solid white;}")
 
 
 if __name__ == '__main__':
