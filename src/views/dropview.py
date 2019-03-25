@@ -1,7 +1,7 @@
 
-from PySide2.QtCore import Qt, Signal, QPoint, QSize
+from PySide2.QtCore import QPoint
 from PySide2.QtGui import QPainter, QPixmap
-from PySide2.QtWidgets import QWidget, QStackedWidget, QStyleOption, QStyle
+from PySide2.QtWidgets import QStackedWidget
 
 class DropView(QStackedWidget):
 	""" A widget for the application background

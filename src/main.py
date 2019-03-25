@@ -1,11 +1,11 @@
 
-import os, sys
+import sys
 
 import time
 
 from PBL.htmlcleaner import HTMLCleaner
-from views import *
-from ext import *
+from views import pagedtextedit, navpanel, dropview, menubar, toolbar, statusbar
+from ext import find, wordcount
 from utils.colorutils import ColorUtils
 from utils.genutils import GenUtils
 

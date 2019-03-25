@@ -1,12 +1,11 @@
 
-import os, sys
+import os
 
-# TODO Use specific imports
-from PySide2.QtCore import * # Qt
-from PySide2.QtWidgets import * # QWidget, QScrollArea, QStackedWidget, QVBoxLayout, QSizePolicy
-from PySide2.QtGui import *
+from PySide2.QtCore import Qt
+from PySide2.QtWidgets import QScrollArea, QWidget, QLayout, QStackedWidget, QMenu, QVBoxLayout, QHBoxLayout, QAction, QFontComboBox, QComboBox, QSizePolicy, QToolButton
+from PySide2.QtGui import QPixmap, QFont, QColor, QIcon, QKeySequence, QIntValidator, QImage
 
-from views import themethumb
+from views.themethumb import ThemeThumb
 from utils.colorutils import ColorUtils
 from utils.genutils import GenUtils
 from PIL import Image
@@ -187,8 +186,9 @@ class ThemesPage(QWidget):
 		t_vlayout = QVBoxLayout()
 		t_vlayout.setMargin(0)
 
-		themedir = 'src/themes'
+		themedir = GenUtils.resource_path('src/themes')
 		for theme in os.listdir(themedir):
+			# FIXME Dont call GenUtils.resource_path() twice
 			rel_path = GenUtils.resource_path(os.path.join(themedir, theme))
 			if os.path.isfile(rel_path):
 				im = Image.open(rel_path)
@@ -200,7 +200,7 @@ class ThemesPage(QWidget):
 				qim = QImage(data, im.size[0], im.size[1], QImage.Format_ARGB32)
 
 				pixmap = QPixmap.fromImage(qim)
-				theme_view = themethumb.ThemeThumb()
+				theme_view = ThemeThumb()
 				theme_view.setPixmap(pixmap)
 				theme_view.clicked.connect(lambda tp=rel_path: self.parent.setTheme(tp))
 

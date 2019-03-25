@@ -1,7 +1,5 @@
 
-
 from PySide2.QtWidgets import QStatusBar
-
 from views.clickablelabel import ClickableLabel
 
 class StatusBar(QStatusBar):
