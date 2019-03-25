@@ -16,13 +16,11 @@ from PySide2.QtPrintSupport import QPrintDialog, QPrinter
 from PIL import Image
 
 main_windows = []
-LEFT_INDENT = 1; RIGHT_INDENT = 2; CENTER_INDENT = 3; JUSTIFY_INDENT = 4 # Constants
 m_theme = GenUtils.resource_path('src/themes/13.jpg')
 
 def create_main_window(): # TODO this function should require a theme attribute
 	"""Creates a MainWindow."""
 	main_win = MainWindow()
-	main_win._setup_components()
 	main_win.setTheme(m_theme)
 	main_windows.append(main_win)
 	main_win.show()
@@ -31,8 +29,8 @@ def create_main_window(): # TODO this function should require a theme attribute
 
 class MainWindow(QMainWindow):
 	"""Contains a menubar, statusbar
-	also contains a QWidget, container, as central widget
-	container contains the PagedTextEdit. """
+	also contains a QStackedWidget DropView as central widget.
+	dropView contains the PagedTextEdit. """
 	def __init__(self, fileName=None):
 		super(MainWindow, self).__init__()
 
@@ -47,9 +45,9 @@ class MainWindow(QMainWindow):
 		# self.resize(available_geometry.width(), available_geometry.height())
 		self.readSettings()
 
-		self.container = dropview.DropView()
+		self.dropView = dropview.DropView()
 
-		self.paged_text_edit = pagedtextedit.PagedTextEdit(self.container)
+		self.paged_text_edit = pagedtextedit.PagedTextEdit(self.dropView)
 		# The textedit must be transparent; the white pages are painted in paintEvent() function
 		self.paged_text_edit.setStyleSheet("QTextEdit { background-color: transparent }")
 
@@ -66,12 +64,9 @@ class MainWindow(QMainWindow):
 		self.paged_text_edit.setUsePageMode(True)
 		self.paged_text_edit.setPageNumbersAlignment(Qt.AlignBottom | Qt.AlignCenter)
 
-		self.nav_panel = navpanel.NavPanel(self)
-		self.nav_panel.setVisible(False)
-
 		self.text_edit_layout = QHBoxLayout()
 		self.text_edit_layout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
-		self.text_edit_layout.addWidget(self.nav_panel)
+		
 		self.text_edit_layout.setMargin(0)
 		self.paged_text_edit.setLayout(self.text_edit_layout)
 
@@ -83,133 +78,41 @@ class MainWindow(QMainWindow):
 		self.paged_text_edit.document().setUndoRedoEnabled(False)
 		self.paged_text_edit.document().setUndoRedoEnabled(True)
 
-		# self.layout = QHBoxLayout()
-		# self.layout.addWidget(self.paged_text_edit)
-		# self.layout.setMargin(0)
-		# self.container.setLayout(self.layout)
-		self.setCentralWidget(self.container)
+		self.setCentralWidget(self.dropView)
 
-		self.container.addWidget(self.paged_text_edit)
-		self.container.setCurrentWidget(self.paged_text_edit)
+		self.dropView.addWidget(self.paged_text_edit)
+		self.dropView.setCurrentWidget(self.paged_text_edit)
+
+		self._setup_components()
 
 		self.setCurrentFile('')
 		self.paged_text_edit.document().contentsChanged.connect(self.documentWasModified)
 		self.paged_text_edit.currentCharFormatChanged.connect(self.updateFontWidgets)
 		self.paged_text_edit.cursorPositionChanged.connect(self.updateIndentWidgets)
+		self.paged_text_edit.pageInfo.connect(self.readPageInfo)
+		
+		self.statusBar.writeMessageOnStatus("Ready", 10000)
 
 	def _setup_components(self):
-		self._create_menus()
-		self._create_actions()
-		self._create_tool_bar()
-		self._create_status_bar()
 
+		self.toolBar = toolbar.ToolBar(self)
+		self.addToolBar(Qt.LeftToolBarArea, self.toolBar)
+
+		self.menuBar = menubar.MenuBar(self)
+		self.setMenuBar(self.menuBar)
+
+		self.statusBar = statusbar.StatusBar(self)
 		self.setStatusBar(self.statusBar)
-		self.printMessageOnStatus("Ready", 10000)
-		self.paged_text_edit.pageInfo.connect(self.readPageInfo)
 
-		self.file_menu.addAction(self.new_action)
-		self.file_menu.addAction(self.open_action)
-		self.file_menu.addAction(self.save_action)
-		self.file_menu.addAction(self.save_as_action)
-		self.file_menu.addSeparator()
-		self.file_menu.addAction(self.print_action)
-		self.file_menu.addSeparator()
-		self.file_menu.addAction(self.exit_action)
-
-		self.edit_menu.addAction(self.cut_action)
-		self.edit_menu.addAction(self.copy_action)
-		self.edit_menu.addAction(self.paste_action)
-		self.edit_menu.addSeparator()
-		self.edit_menu.addAction(self.undo_action)
-		self.edit_menu.addAction(self.redo_action)
-		self.edit_menu.addSeparator()
-		self.edit_menu.addAction(self.select_all_action)
-		self.edit_menu.addSeparator()
-		self.edit_menu.addAction(self.find_action)
-		self.edit_menu.addSeparator()
-		self.edit_menu.addAction(self.word_count_action)
-		self.edit_menu.addSeparator()
-		self.edit_menu.addAction(self.image_action)
-		
-		self.themes_menu.addAction(self.themes_action)
-		self.about_menu.addAction(self.about_action)
-
-		self.main_tool_bar.addAction(self.main_format_action)
-		self.main_tool_bar.addAction(self.main_sections_action)
-		self.main_tool_bar.addAction(self.main_themes_action)
+		self.nav_panel = navpanel.NavPanel(self)
+		self.nav_panel.setVisible(False)
+		self.text_edit_layout.addWidget(self.nav_panel)
 
 	def navSelectorClicked(self, page):
 		if(self.nav_panel.setCurrentPage(page)):
 			pass
 		else:
 			self.nav_panel.toggleVisibility()
-
-	def _create_actions(self):
-		self.new_action  = QAction(QIcon(GenUtils.resource_path('src/images/new.png')), "&New", self, shortcut=QKeySequence.New, statusTip="Create a New File", triggered=self.newFile)
-		self.open_action = QAction(QIcon(GenUtils.resource_path('src/images/open.png')), "O&pen", self, shortcut=QKeySequence.Open, statusTip="Open an existing file", triggered=self.open)
-		self.save_action = QAction(QIcon(GenUtils.resource_path('src/images/save.png')), "&Save", self, shortcut=QKeySequence.Save, statusTip="Save the current file to disk", triggered=self.save)
-		self.save_as_action = QAction(QIcon(GenUtils.resource_path('src/images/save.png')), "Save &As...", self, shortcut=QKeySequence.SaveAs, statusTip="Save the current file under a new name", triggered=self.saveAs)
-		self.print_action = QAction(QIcon(GenUtils.resource_path('src/images/print.png')), "&Print...", self, shortcut=QKeySequence.Print, statusTip="Print the current file", triggered=self.print_)
-		self.exit_action = QAction(QIcon.fromTheme("application-exit"), "E&xit", self, shortcut="Ctrl+Q", statusTip="Exit the Application", triggered=self.close)
-		self.cut_action = QAction(QIcon(GenUtils.resource_path('src/images/cut.png')), "C&ut", self, shortcut=QKeySequence.Cut, statusTip="Cut the current selection to clipboard", triggered=self.paged_text_edit.cut)
-		self.copy_action = QAction(QIcon(GenUtils.resource_path('src/images/copy.png')), "C&opy", self, shortcut=QKeySequence.Copy, statusTip="Copy the current selection to clipboard", triggered=self.paged_text_edit.copy)
-		self.paste_action = QAction(QIcon(GenUtils.resource_path('src/images/paste.png')), "&Paste", self, shortcut=QKeySequence.Paste, statusTip="Paste the clipboard's content in current location", triggered=self.paged_text_edit.paste)
-		self.select_all_action = QAction(QIcon(GenUtils.resource_path('src/images/selectAll.png')), "Select All", self, statusTip="Select All", triggered=self.paged_text_edit.selectAll)
-		self.redo_action = QAction(QIcon(GenUtils.resource_path('src/images/redo.png')),"Redo", self, shortcut=QKeySequence.Redo, statusTip="Redo previous action", triggered=self.paged_text_edit.redo)
-		self.undo_action = QAction(QIcon(GenUtils.resource_path('src/images/undo.png')),"Undo", self, shortcut=QKeySequence.Undo, statusTip="Undo previous action", triggered=self.paged_text_edit.undo)
-		self.themes_action = QAction(QIcon(GenUtils.resource_path('src/images/save.png')), "&Themes...", self, statusTip = "Themes", triggered = self.fontChange)
-		self.about_action = QAction(QIcon(GenUtils.resource_path('src/images/about.png')), 'A&bout', self, shortcut = QKeySequence(QKeySequence.HelpContents), triggered=self.about_pablo)
-		self.find_action = QAction(QIcon(GenUtils.resource_path('src/images/save.png')), '&Find', self, shortcut = QKeySequence(QKeySequence.Find), triggered=self._find)
-		self.word_count_action = QAction(QIcon(GenUtils.resource_path('src/images/save.png')), 'Word Count', self, shortcut = "Ctrl+W", triggered=self.showWordCount)
-		self.image_action = QAction(QIcon(GenUtils.resource_path('src/images/save.png')), 'I&mage', self, shortcut = "Ctrl+Shift+I", statusTip = "Insert image", triggered=self.insertImage)
-		
-
-		# Actions grouped into tuples to ease display in navbar
-		self.edit_actions = (QAction(QIcon(GenUtils.resource_path('src/images/bold.png')), "Bold", self, checkable=True, shortcut=QKeySequence.Bold, triggered=self._bold),
-				QAction(QIcon(GenUtils.resource_path('src/images/italic.png')), "Italic", self, checkable=True, shortcut=QKeySequence.Italic, triggered=self._italic),
-				QAction(QIcon(GenUtils.resource_path('src/images/underline.png')), "Underline", self, checkable=True, shortcut=QKeySequence.Underline, triggered=self._underline))
-		self.indent_actions = (QAction(QIcon(GenUtils.resource_path('src/images/align-left.png')), "Left", self, checkable=True, statusTip="Left indent", triggered=self._indentLeft),
-				QAction(QIcon(GenUtils.resource_path('src/images/align-right.png')), "Right", self, checkable=True, statusTip="Right indent", triggered=self._indentRight),
-				QAction(QIcon(GenUtils.resource_path('src/images/align-center.png')), "Center", self, checkable=True, shortcut="Ctrl+E", statusTip="Center indent", triggered=self._indentCenter),
-				QAction(QIcon(GenUtils.resource_path('src/images/align-justify.png')), "Justify", self, checkable=True, statusTip="Justify indent", triggered=self._indentJustify))
-
-		
-		# Side toolbar actions...
-		self.main_format_action = QAction(QIcon(GenUtils.resource_path('src/images/arrow.png')), "&Format", self, statusTip = "Format", triggered=(lambda page=1: self.navSelectorClicked(page)))
-		self.main_sections_action = QAction(QIcon(GenUtils.resource_path('src/images/attach.png')), "&Sections", self, statusTip = "Sections", triggered=(lambda page=2: self.navSelectorClicked(page)))
-		self.main_themes_action = QAction(QIcon(GenUtils.resource_path('src/images/theme.png')), "&Themes", self, statusTip = "Themes", triggered=(lambda page=3: self.navSelectorClicked(page)))
-		
-		self.cut_action.setEnabled(False)
-		self.copy_action.setEnabled(False)
-		self.undo_action.setEnabled(False)
-		self.redo_action.setEnabled(False)
-		self.paged_text_edit.copyAvailable.connect(self.cut_action.setEnabled)
-		self.paged_text_edit.copyAvailable.connect(self.copy_action.setEnabled)
-		self.paged_text_edit.undoAvailable.connect(self.undo_action.setEnabled)
-		self.paged_text_edit.redoAvailable.connect(self.redo_action.setEnabled)
-
-	def _create_tool_bar(self):
-		self.main_tool_bar = QToolBar()
-		self.addToolBar(Qt.LeftToolBarArea, self.main_tool_bar)
-		self.main_tool_bar.setMovable(False)
-		self.main_tool_bar.setIconSize(QSize(30, 30));
-		self.main_tool_bar.setFixedWidth(45);
-
-	def _create_menus(self):
-		self.file_menu = self.menuBar().addMenu("&File")
-		self.edit_menu = self.menuBar().addMenu("&Edit")
-		self.themes_menu = self.menuBar().addMenu("&Themes")
-		self.about_menu = self.menuBar().addMenu("&About")
-
-	def _create_status_bar(self):
-		self.statusBar = QStatusBar()
-		self.wordCountLabel = clickablelabel.ClickableLabel()
-		self.wordCountLabel.clicked.connect(self.word_count_action.triggered.emit)
-		self.statusBar.addPermanentWidget(self.wordCountLabel)
-		
-		self.pageInfoStatusLabel = clickablelabel.ClickableLabel()
-		# self.wordCountLabel.clicked.connect(TODO)
-		self.statusBar.addPermanentWidget(self.pageInfoStatusLabel)
 
 	def newFile(self):
 		if self.maybeSave():
@@ -261,7 +164,7 @@ class MainWindow(QMainWindow):
 		QApplication.restoreOverrideCursor()
 
 		self.setCurrentFile(fileName)
-		self.printMessageOnStatus("File loaded", 2000)
+		self.statusBar.writeMessageOnStatus("File loaded", 2000)
 
 	def saveFile(self, fileName):
 		file = QFile(fileName)
@@ -320,7 +223,7 @@ class MainWindow(QMainWindow):
 
 		document.print_(printer)
 
-		self.printMessageOnStatus("Ready", 2000)
+		self.statusBar.writeMessageOnStatus("Ready", 2000)
 
 	def strippedName(self, fullFileName):
 		return QFileInfo(fullFileName).fileName()
@@ -364,98 +267,54 @@ class MainWindow(QMainWindow):
 		format.setFontUnderline(self.edit_actions[2].isChecked())
 		self.paged_text_edit.mergeCurrentCharFormat(format)
 		
-	def _fontFamily(self):
+	def _fontFamily(self, font):
 		format = QTextCharFormat()
-		format.setFontFamily(self.format_widgets[0].currentFont().family())
+		format.setFontFamily(font.family())
 		self.paged_text_edit.mergeCurrentCharFormat(format)
 
-	def _fontSize(self):
+	def _fontSize(self, size):
 		format = QTextCharFormat()
-		format.setFontPointSize(int(self.format_widgets[1].currentText()))
+		format.setFontPointSize(int(size))
 		self.paged_text_edit.mergeCurrentCharFormat(format)
 
-	@Slot(QTextCharFormat)
-	def updateFontWidgets(self, format):
-		"""Responsible for updating font widgets when cursor position is changed.
-		Checks for bold, italic, underline, font size, font family and font color in selected text. """
-
-		self.edit_actions[0].setChecked(True if format.fontWeight() == QFont.Bold else False)
-		self.edit_actions[1].setChecked(format.fontItalic())
-		self.edit_actions[2].setChecked(format.fontUnderline())
-
-		self.format_widgets[1].setCurrentIndex(self.format_widgets[1].findText(str(int(format.fontPointSize()))))
-		self.format_widgets[0].setCurrentIndex(self.format_widgets[0].findText(str(format.fontFamily())))
-		self.format_widgets[2].setIcon(ColorUtils.createColorToolButtonIcon('src/images/textpointer.png', format.foreground()))
-
-	def updateIndentWidgets(self):
-		"""Responsible for updating indent widgets."""
-
-		al = self.paged_text_edit.alignment()
-		if(al == Qt.AlignLeft):
-			self.indent_triggered(LEFT_INDENT)
-		elif(al == Qt.AlignRight):
-			self.indent_triggered(RIGHT_INDENT)
-		elif(al == Qt.AlignCenter):
-			self.indent_triggered(CENTER_INDENT)
-		elif(al == Qt.AlignJustify):
-			self.indent_triggered(JUSTIFY_INDENT)
-
-	def _indentLeft(self):
-		self.paged_text_edit.setAlignment(Qt.AlignLeft)
-
-	def _indentRight(self):
-		self.paged_text_edit.setAlignment(Qt.AlignRight)
-
-	def _indentCenter(self):
-		if(self.paged_text_edit.alignment() == Qt.AlignCenter):
-			self._indentLeft()
-		else:
-			self.paged_text_edit.setAlignment(Qt.AlignCenter)
-
-	def _indentJustify(self):
-		self.paged_text_edit.setAlignment(Qt.AlignJustify)
-
-	def indent_triggered(self, indent):
-		for action in self.indent_actions:
-			action.setChecked(False)
-
-		# TODO Use dict as alternative to Switch statement here
-		if(indent == LEFT_INDENT):
-			self.indent_actions[0].setChecked(True)
-		elif(indent == RIGHT_INDENT):
-			self.indent_actions[1].setChecked(True)
-		elif(indent == CENTER_INDENT):
-			self.indent_actions[2].setChecked(True)
-		elif(indent == JUSTIFY_INDENT):
-			self.indent_actions[3].setChecked(True)
-
-	def pageScaleChanged(self, scale):
-		pass
-
-	def textColorChanged(self):
-		newColor = QColor(self.sender().data())
-		self.format_widgets[2].setIcon(ColorUtils.createColorToolButtonIcon('src/images/textpointer.png', 
-				newColor))
-		self.textButtonTriggered(newColor)
-
-	def textButtonTriggered(self, color):
+	def _fontColor(self, color):
 		format = QTextCharFormat()
 		format.setForeground(color)
 		self.paged_text_edit.mergeCurrentCharFormat(format)
 
-	def createColorMenu(self, slot, defaultColor):
-		colors = [Qt.black, Qt.white, Qt.red, Qt.blue, Qt.yellow]
-		names = ["black", "white", "red", "blue", "yellow"]
+	def pageScaleChanged(self, scale):
+		pass
 
-		colorMenu = QMenu(self)
-		for color, name in zip(colors, names):
-			action = QAction(ColorUtils.createColorIcon(color), name, self,
-					triggered=slot)
-			action.setData(QColor(color))
-			colorMenu.addAction(action)
-			if color == defaultColor:
-				colorMenu.setDefaultAction(action)
-		return colorMenu
+	def _indent(self, alignment):
+		
+		if(alignment != Qt.AlignLeft):
+			# If applied indent is already present, revert to default left indent
+			if(self.paged_text_edit.alignment() == alignment):
+				self.paged_text_edit.setAlignment(Qt.AlignLeft)
+			else:
+				self.paged_text_edit.setAlignment(alignment)
+		else:
+				self.paged_text_edit.setAlignment(alignment)
+
+		self.updateIndentWidgets()
+		
+
+
+	@Slot(QTextCharFormat)
+	def updateFontWidgets(self, format):
+		self.nav_panel.updateFormatWidgets(format)
+
+	def updateIndentWidgets(self):
+		"""Responsible for updating indent widgets."""
+
+		indentID = GenUtils.getIndentID(self.paged_text_edit.alignment())
+
+		for index, action in enumerate(self.indent_actions, start=1):
+			if(index == indentID):
+				action.setChecked(True)
+			else:
+				action.setChecked(False)
+
 
 	def _find(self):
 		ff = find.Find(self)
@@ -504,26 +363,21 @@ class MainWindow(QMainWindow):
 	def readPageInfo(self, pageInfo):
 		self.curPage = pageInfo
 		pageMessage = "  " + str(pageInfo[0]) + " / " + str(pageInfo[1]) + "    "
-		self.pageInfoStatusLabel.setText(pageMessage)
+		self.statusBar.writePageInfo(pageMessage)
 
 	def updateWordCount(self):
 		count = GenUtils.count_words(self.paged_text_edit.toPlainText())
 		wordCountInfo = count[0] + " words;  " + count[1] + " symbols   "
-		self.wordCountLabel.setText(wordCountInfo)
-
-	def printMessageOnStatus(self, message, timeout=5000):                                                   
-		self.statusBar.showMessage(message, timeout)
+		self.statusBar.writeWordCount(wordCountInfo)
 
 	def setTheme(self, themePath):
 
-		self.container.dropImage(themePath)
+		self.dropView.dropImage(themePath)
 
 		mainColorHex = ColorUtils.getDominantColorFromImage(Image.open(themePath))
 
 		self.setStyleSheet("QMainWindow { background-color: " + mainColorHex + " }")
-		self.main_tool_bar.setStyleSheet(".QToolBar { background-color: transparent; border: none; } .QToolButton { margin-bottom: 10px; margin-top: 10px; } ")
-		self.statusBar.setStyleSheet(".QStatusBar { background-color: transparent; border: none; color: white;}")
-		self.nav_panel.setStyleSheet("QScrollArea { background-color: " + mainColorHex  + "ca ; border: none; border-left: 1px solid white;}")
+		self.nav_panel.setStyleSheet("QScrollArea { background-color: " + mainColorHex  + "ca }")
 
 
 if __name__ == '__main__':

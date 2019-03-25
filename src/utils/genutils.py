@@ -1,6 +1,8 @@
 import os
 import sys
 
+from PySide2.QtCore import Qt
+
 class GenUtils:
 	"""This class contains general utility functions. """
 
@@ -16,4 +18,16 @@ class GenUtils:
 
 	def count_words(text):
 		return (str(len(text.split())), str(len(text)))
+
+	def getIndentID(indent):
+
+		if(indent == Qt.AlignRight):
+			return 2
+		elif(indent == Qt.AlignCenter):
+			return 3
+		elif(indent == Qt.AlignJustify):
+			return 4
+		else:
+			return 1
+		
 		

@@ -31,7 +31,6 @@ class ThemeThumb(QWidget):
 		else:
 			return width
 	
-
 	def paintEvent(self, _event):
 		if(not self.pix):
 			return

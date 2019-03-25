@@ -19,6 +19,9 @@ class NavPanel(QScrollArea):
 		super(NavPanel, self).__init__()
 
 		self.parent = parent
+
+		self.setObjectName("MyNavPanel")
+		self.setStyleSheet("QScrollArea#MyNavPanel { border: none; border-left: 1px solid white; }")
 		
 		self.setFixedWidth(200)
 		sizePolicy = QSizePolicy()
@@ -29,7 +32,7 @@ class NavPanel(QScrollArea):
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
 		self.stacked_widget = QStackedWidget()
-		self.stacked_widget.setStyleSheet(".QStackedWidget {background-color: transparent; border: none;}")
+		self.stacked_widget.setStyleSheet(".QStackedWidget {background-color: transparent; border: none ;}")
 
 		self.formatPage = FormatPage(self.parent)
 		self.sectionsPage = SectionsPage(self.parent)
@@ -60,6 +63,18 @@ class NavPanel(QScrollArea):
 
 	def toggleVisibility(self):
 		self.setVisible(not self.isVisible())
+
+	def updateFormatWidgets(self, format):
+		"""Responsible for updating font widgets when cursor position is changed.
+		Checks for bold, italic, underline, font size, font family and font color in selected text. """
+
+		self.formatPage.fontSizeCombo.setCurrentIndex(self.formatPage.fontSizeCombo.findText(str(int(format.fontPointSize()))))
+		self.formatPage.fontCombo.setCurrentIndex(self.formatPage.fontCombo.findText(str(format.fontFamily())))
+		self.formatPage.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('src/images/textpointer.png', format.foreground()))
+
+		self.parent.edit_actions[0].setChecked(True if format.fontWeight() == QFont.Bold else False)
+		self.parent.edit_actions[1].setChecked(format.fontItalic())
+		self.parent.edit_actions[2].setChecked(format.fontUnderline())
             
 
 class FormatPage(QWidget):
@@ -68,60 +83,94 @@ class FormatPage(QWidget):
 
 		self.parent = parent
 
+		self.createActions()
+
 		f_vlayout = QVBoxLayout()
+		f_vlayout.setMargin(0)
 
-		fontCombo = QFontComboBox()
-		fontCombo.currentFontChanged.connect(self.parent._fontFamily)
+		self.fontCombo = QFontComboBox()
+		self.fontCombo.currentFontChanged[QFont].connect(self.parent._fontFamily)
 		
-		fontSizeCombo = QComboBox()
-		fontSizeCombo.setEditable(True)
+		self.fontSizeCombo = QComboBox()
+		self.fontSizeCombo.setEditable(True)
 		for i in range(8, 30, 2):
-			fontSizeCombo.addItem(str(i))
+			self.fontSizeCombo.addItem(str(i))
 		validator = QIntValidator(2, 64, self.parent)
-		fontSizeCombo.setValidator(validator)
-		fontSizeCombo.currentIndexChanged.connect(self.parent._fontSize)
+		self.fontSizeCombo.setValidator(validator)
+		self.fontSizeCombo.currentIndexChanged[str].connect(self.parent._fontSize)
 		
-		fontColorToolButton = QToolButton()
-		fontColorToolButton.setPopupMode(QToolButton.MenuButtonPopup)
-		fontColorToolButton.setMenu(self.parent.createColorMenu(self.parent.textColorChanged, Qt.black))
-		# self.textAction = fontColorToolButton.menu().defaultAction()
-		fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('src/images/textpointer.png', Qt.black))
+		self.fontColorToolButton = QToolButton()
+		self.fontColorToolButton.setPopupMode(QToolButton.MenuButtonPopup)
+		self.fontColorToolButton.setMenu(self.createColorMenu(self.textColorChanged, Qt.black))
+		# self.textAction = self.fontColorToolButton.menu().defaultAction()
+		self.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('src/images/textpointer.png', Qt.black))
 		# FIXME parameter is set to bool; get selected menu color and parse as argument
-		fontColorToolButton.clicked.connect(self.parent.textButtonTriggered)
+		self.fontColorToolButton.clicked.connect(self.parent._fontColor)
 		
-		pageScaleCombo = QComboBox()
-		pageScaleCombo.addItems(["50%", "75%", "100%", "125%", "150%"])
-		pageScaleCombo.setCurrentIndex(2)
-		pageScaleCombo.currentIndexChanged[str].connect(self.parent.pageScaleChanged)
+		self.pageScaleCombo = QComboBox()
+		self.pageScaleCombo.addItems(["50%", "75%", "100%", "125%", "150%"])
+		self.pageScaleCombo.setCurrentIndex(2)
+		self.pageScaleCombo.currentIndexChanged[str].connect(self.parent.pageScaleChanged)
 
-		editBar = QWidget()
-		editLay = QHBoxLayout(editBar)
+		self.editBar = QWidget()
+		editLay = QHBoxLayout(self.editBar)
 		editLay.setSizeConstraint(QLayout.SetFixedSize)
-		# for action in self.parent.edit_actions:
-		# 	self.parent.addAction(action) # prevents action from being disabled when navbar is hidden
-		# 	button = QToolButton()
-		# 	button.setDefaultAction(action)
-		# 	editLay.addWidget(button)
-		editBar.setLayout(editLay)
+		for action in self.parent.edit_actions:
+			self.parent.addAction(action) # prevents action from being disabled when navbar is hidden
+			button = QToolButton()
+			button.setDefaultAction(action)
+			editLay.addWidget(button)
+		self.editBar.setLayout(editLay)
 
-		indentBar = QWidget()
-		indentLay = QHBoxLayout(indentBar)
+		self.indentBar = QWidget()
+		indentLay = QHBoxLayout(self.indentBar)
 		indentLay.setSizeConstraint(QLayout.SetFixedSize)
-		# for action in self.parent.indent_actions:
-		# 	self.parent.addAction(action) # prevents action from being disabled when navbar is hidden
-		# 	button = QToolButton()
-		# 	button.setDefaultAction(action)
-		# 	indentLay.addWidget(button)
-		indentBar.setLayout(indentLay)
+		for action in self.parent.indent_actions:
+			self.parent.addAction(action) # prevents action from being disabled when navbar is hidden
+			button = QToolButton()
+			button.setDefaultAction(action)
+			indentLay.addWidget(button)
+		self.indentBar.setLayout(indentLay)
 
-		f_vlayout.addWidget(fontCombo)
-		f_vlayout.addWidget(fontSizeCombo)
-		f_vlayout.addWidget(fontColorToolButton)
-		f_vlayout.addWidget(pageScaleCombo)
-		f_vlayout.addWidget(editBar)
-		f_vlayout.addWidget(indentBar)
+		f_vlayout.addWidget(self.fontCombo)
+		f_vlayout.addWidget(self.fontSizeCombo)
+		f_vlayout.addWidget(self.fontColorToolButton)
+		f_vlayout.addWidget(self.pageScaleCombo)
+		f_vlayout.addWidget(self.editBar)
+		f_vlayout.addWidget(self.indentBar)
 
 		self.setLayout(f_vlayout)
+
+	def createActions(self):
+		# Actions grouped into tuples to ease display in navbar
+		self.parent.edit_actions = (QAction(QIcon(GenUtils.resource_path('src/images/bold.png')), "Bold", self.parent, checkable=True, shortcut=QKeySequence.Bold, triggered=self.parent._bold),
+				QAction(QIcon(GenUtils.resource_path('src/images/italic.png')), "Italic", self.parent, checkable=True, shortcut=QKeySequence.Italic, triggered=self.parent._italic),
+				QAction(QIcon(GenUtils.resource_path('src/images/underline.png')), "Underline", self.parent, checkable=True, shortcut=QKeySequence.Underline, triggered=self.parent._underline))
+		self.parent.indent_actions = (QAction(QIcon(GenUtils.resource_path('src/images/align-left.png')), "Left", self.parent, checkable=True, statusTip="Left indent", triggered=(lambda align=Qt.AlignLeft: self.parent._indent(align))),
+				QAction(QIcon(GenUtils.resource_path('src/images/align-right.png')), "Right", self.parent, checkable=True, statusTip="Right indent", triggered=(lambda align=Qt.AlignRight: self.parent._indent(align))),
+				QAction(QIcon(GenUtils.resource_path('src/images/align-center.png')), "Center", self.parent, checkable=True, shortcut="Ctrl+E", statusTip="Center indent", triggered=(lambda align=Qt.AlignCenter: self.parent._indent(align))),
+				QAction(QIcon(GenUtils.resource_path('src/images/align-justify.png')), "Justify", self.parent, checkable=True, statusTip="Justify indent", triggered=(lambda align=Qt.AlignJustify: self.parent._indent(align))))
+
+	def createColorMenu(self, slot, defaultColor):
+		colors = [Qt.black, Qt.white, Qt.red, Qt.blue, Qt.yellow]
+		names = ["black", "white", "red", "blue", "yellow"]
+
+		colorMenu = QMenu(self)
+		for color, name in zip(colors, names):
+			action = QAction(ColorUtils.createColorIcon(color), name, self,
+					triggered=slot)
+			action.setData(QColor(color))
+			colorMenu.addAction(action)
+			if color == defaultColor:
+				colorMenu.setDefaultAction(action)
+		return colorMenu
+
+	def textColorChanged(self):
+		newColor = QColor(self.sender().data())
+		self.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('src/images/textpointer.png', 
+				newColor))
+		self.parent._fontColor(newColor)
+		
 
 class SectionsPage(QWidget):
 	def __init__(self, parent=None):
@@ -136,6 +185,7 @@ class ThemesPage(QWidget):
 		self.parent = parent
 
 		t_vlayout = QVBoxLayout()
+		t_vlayout.setMargin(0)
 
 		themedir = 'src/themes'
 		for theme in os.listdir(themedir):

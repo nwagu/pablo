@@ -5,8 +5,8 @@ import scipy
 import scipy.misc
 import scipy.cluster
 
-from PySide2.QtGui import *
-from PySide2.QtCore import *
+from PySide2.QtGui import QPainter, QPixmap, QIcon
+from PySide2.QtCore import Qt, QRect
 
 class ColorUtils:
 	"""This class contains utility functions for color. """
