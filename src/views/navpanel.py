@@ -40,7 +40,7 @@ class NavPanel(QScrollArea):
 		self.stacked_widget.addWidget(self.formatPage)
 		self.stacked_widget.addWidget(self.sectionsPage)
 		self.stacked_widget.addWidget(self.themesPage)
-		self.setCurrentPage(1)
+		# self.setCurrentPage(1)
 
 		self.setWidget(self.stacked_widget)
 		self.setWidgetResizable(True)
@@ -56,9 +56,17 @@ class NavPanel(QScrollArea):
 		pageChanged = (page != self.CURRENT_PAGE)
 		if(not self.isVisible()):
 			pageChanged = False
+
 		self.CURRENT_PAGE = page
 
-		return pageChanged
+		if(not pageChanged):
+			self.toggleVisibility()
+
+		for index, action in enumerate(self.parent.tool_bar_actions, start=1):
+			if (index == self.CURRENT_PAGE and self.isVisible()):
+				action.setChecked(True)
+			else:
+				action.setChecked(False)
 
 	def toggleVisibility(self):
 		self.setVisible(not self.isVisible())

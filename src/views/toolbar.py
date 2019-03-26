@@ -25,13 +25,15 @@ class ToolBar(QToolBar):
 		self.createTools()
 
 	def createTools(self):
-		self.addAction(self.parent.main_format_action)
-		self.addAction(self.parent.main_sections_action)
-		self.addAction(self.parent.main_themes_action)
+		for action in self.parent.tool_bar_actions:
+			self.addAction(action)
 		
 	def createActions(self):
-		self.parent.main_format_action = QAction(qta.icon('fa5s.file'), "&Format", self.parent, statusTip = "Format", triggered=(lambda page=1: self.parent.navSelectorClicked(page)))
-		self.parent.main_sections_action = QAction(qta.icon('fa5s.music'), "&Sections", self.parent, statusTip = "Sections", triggered=(lambda page=2: self.parent.navSelectorClicked(page)))
-		self.parent.main_themes_action = QAction(qta.icon('fa5s.camera'), "&Themes", self.parent, statusTip = "Themes", triggered=(lambda page=3: self.parent.navSelectorClicked(page)))
-		
-		# qta.icon('fa5.file', 'fa5s.camera', options=[{'scale_factor': 0.5, 'active': 'fa5s.balance-scale'}, {'color': 'red'}])
+		format_icon = qta.icon('fa5s.file', selected='fa5s.file', color_off='gray', color_off_active='white', color_on='white', color_on_active='white')
+		sections_icon = qta.icon('fa5s.bookmark', selected='fa5s.bookmark', color_off='gray', color_off_active='white', color_on='white', color_on_active='white')
+		themes_icon = qta.icon('fa5s.cog', selected='fa5s.cog', color_off='gray', color_off_active='white', color_on='white', color_on_active='white')
+
+		self.parent.tool_bar_actions = (QAction(format_icon, "&Format", self.parent, checkable=True, statusTip = "Format", triggered=(lambda page=1: self.parent.navSelectorClicked(page))),
+				QAction(sections_icon, "&Sections", self.parent, checkable=True, statusTip = "Sections", triggered=(lambda page=2: self.parent.navSelectorClicked(page))),
+				QAction(themes_icon, "&Themes", self.parent, checkable=True, statusTip = "Themes", triggered=(lambda page=3: self.parent.navSelectorClicked(page))))
+	

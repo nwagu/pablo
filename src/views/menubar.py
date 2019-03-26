@@ -57,7 +57,7 @@ class MenuBar(QMenuBar):
 		self.parent.new_action  = QAction(qta.icon('fa5s.file'), "&New", self.parent, shortcut=QKeySequence.New, statusTip="Create a New File", triggered=self.parent.newFile)
 		self.parent.open_action = QAction(qta.icon('fa5s.file'), "O&pen", self.parent, shortcut=QKeySequence.Open, statusTip="Open an existing file", triggered=self.parent.open)
 		self.parent.save_action = QAction(qta.icon('fa5s.save'), "&Save", self.parent, shortcut=QKeySequence.Save, statusTip="Save the current file to disk", triggered=self.parent.save)
-		self.parent.save_as_action = QAction(qta.icon('fa5s.file'), "Save &As...", self.parent, shortcut=QKeySequence.SaveAs, statusTip="Save the current file under a new name", triggered=self.parent.saveAs)
+		self.parent.save_as_action = QAction("Save &As...", self.parent, shortcut=QKeySequence.SaveAs, statusTip="Save the current file under a new name", triggered=self.parent.saveAs)
 		self.parent.print_action = QAction(qta.icon('fa5s.print'), "&Print...", self.parent, shortcut=QKeySequence.Print, statusTip="Print the current file", triggered=self.parent.print_)
 		self.parent.exit_action = QAction(QIcon.fromTheme("application-exit"), "E&xit", self.parent, shortcut="Ctrl+Q", statusTip="Exit the Application", triggered=self.close)
 		self.parent.cut_action = QAction(qta.icon('fa5s.cut'), "C&ut", self.parent, shortcut=QKeySequence.Cut, statusTip="Cut the current selection to clipboard", triggered=self.parent.paged_text_edit.cut)

@@ -109,10 +109,7 @@ class MainWindow(QMainWindow):
 		self.text_edit_layout.addWidget(self.nav_panel)
 
 	def navSelectorClicked(self, page):
-		if(self.nav_panel.setCurrentPage(page)):
-			pass
-		else:
-			self.nav_panel.toggleVisibility()
+		self.nav_panel.setCurrentPage(page)
 
 	def newFile(self):
 		if self.maybeSave():
