@@ -4,7 +4,7 @@ import os
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QScrollArea, QWidget, QLayout, QStackedWidget, QMenu, QVBoxLayout, QHBoxLayout, QAction, QFontComboBox, QComboBox, QSizePolicy, QToolButton
 from PySide2.QtGui import QPixmap, QFont, QColor, QIcon, QKeySequence, QIntValidator, QImage
-
+import qtawesome as qta
 from views.themethumb import ThemeThumb
 from utils.colorutils import ColorUtils
 from utils.genutils import GenUtils
@@ -69,7 +69,7 @@ class NavPanel(QScrollArea):
 
 		self.formatPage.fontSizeCombo.setCurrentIndex(self.formatPage.fontSizeCombo.findText(str(int(format.fontPointSize()))))
 		self.formatPage.fontCombo.setCurrentIndex(self.formatPage.fontCombo.findText(str(format.fontFamily())))
-		self.formatPage.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('src/images/textpointer.png', format.foreground()))
+		self.formatPage.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon(qta.icon('fa5s.font'), format.foreground()))
 
 		self.parent.edit_actions[0].setChecked(True if format.fontWeight() == QFont.Bold else False)
 		self.parent.edit_actions[1].setChecked(format.fontItalic())
@@ -102,9 +102,7 @@ class FormatPage(QWidget):
 		self.fontColorToolButton.setPopupMode(QToolButton.MenuButtonPopup)
 		self.fontColorToolButton.setMenu(self.createColorMenu(self.textColorChanged, Qt.black))
 		# self.textAction = self.fontColorToolButton.menu().defaultAction()
-		self.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('src/images/textpointer.png', Qt.black))
-		# FIXME parameter is set to bool; get selected menu color and parse as argument
-		self.fontColorToolButton.clicked.connect(self.parent._fontColor)
+		self.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon(qta.icon('fa5s.font'), Qt.black))
 		
 		self.pageScaleCombo = QComboBox()
 		self.pageScaleCombo.addItems(["50%", "75%", "100%", "125%", "150%"])
@@ -142,13 +140,13 @@ class FormatPage(QWidget):
 
 	def createActions(self):
 		# Actions grouped into tuples to ease display in navbar
-		self.parent.edit_actions = (QAction(QIcon(GenUtils.resource_path('src/images/bold.png')), "Bold", self.parent, checkable=True, shortcut=QKeySequence.Bold, triggered=self.parent._bold),
-				QAction(QIcon(GenUtils.resource_path('src/images/italic.png')), "Italic", self.parent, checkable=True, shortcut=QKeySequence.Italic, triggered=self.parent._italic),
-				QAction(QIcon(GenUtils.resource_path('src/images/underline.png')), "Underline", self.parent, checkable=True, shortcut=QKeySequence.Underline, triggered=self.parent._underline))
-		self.parent.indent_actions = (QAction(QIcon(GenUtils.resource_path('src/images/align-left.png')), "Left", self.parent, checkable=True, statusTip="Left indent", triggered=(lambda align=Qt.AlignLeft: self.parent._indent(align))),
-				QAction(QIcon(GenUtils.resource_path('src/images/align-right.png')), "Right", self.parent, checkable=True, statusTip="Right indent", triggered=(lambda align=Qt.AlignRight: self.parent._indent(align))),
-				QAction(QIcon(GenUtils.resource_path('src/images/align-center.png')), "Center", self.parent, checkable=True, shortcut="Ctrl+E", statusTip="Center indent", triggered=(lambda align=Qt.AlignCenter: self.parent._indent(align))),
-				QAction(QIcon(GenUtils.resource_path('src/images/align-justify.png')), "Justify", self.parent, checkable=True, statusTip="Justify indent", triggered=(lambda align=Qt.AlignJustify: self.parent._indent(align))))
+		self.parent.edit_actions = (QAction(qta.icon('fa5s.bold'), "Bold", self.parent, checkable=True, shortcut=QKeySequence.Bold, triggered=self.parent._bold),
+				QAction(qta.icon('fa5s.italic'), "Italic", self.parent, checkable=True, shortcut=QKeySequence.Italic, triggered=self.parent._italic),
+				QAction(qta.icon('fa5s.underline'), "Underline", self.parent, checkable=True, shortcut=QKeySequence.Underline, triggered=self.parent._underline))
+		self.parent.indent_actions = (QAction(qta.icon('fa5s.align-left'), "Left", self.parent, checkable=True, statusTip="Left indent", triggered=(lambda align=Qt.AlignLeft: self.parent._indent(align))),
+				QAction(qta.icon('fa5s.align-right'), "Right", self.parent, checkable=True, statusTip="Right indent", triggered=(lambda align=Qt.AlignRight: self.parent._indent(align))),
+				QAction(qta.icon('fa5s.align-center'), "Center", self.parent, checkable=True, shortcut="Ctrl+E", statusTip="Center indent", triggered=(lambda align=Qt.AlignCenter: self.parent._indent(align))),
+				QAction(qta.icon('fa5s.align-justify'), "Justify", self.parent, checkable=True, statusTip="Justify indent", triggered=(lambda align=Qt.AlignJustify: self.parent._indent(align))))
 
 	def createColorMenu(self, slot, defaultColor):
 		colors = [Qt.black, Qt.white, Qt.red, Qt.blue, Qt.yellow]
@@ -166,7 +164,7 @@ class FormatPage(QWidget):
 
 	def textColorChanged(self):
 		newColor = QColor(self.sender().data())
-		self.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon('src/images/textpointer.png', 
+		self.fontColorToolButton.setIcon(ColorUtils.createColorToolButtonIcon(qta.icon('fa5s.font'), 
 				newColor))
 		self.parent._fontColor(newColor)
 		

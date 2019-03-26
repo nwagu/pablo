@@ -6,7 +6,7 @@ import scipy.misc
 import scipy.cluster
 
 from PySide2.QtGui import QPainter, QPixmap, QIcon
-from PySide2.QtCore import Qt, QRect
+from PySide2.QtCore import Qt, QRect, QSize
 
 class ColorUtils:
 	"""This class contains utility functions for color. """
@@ -28,11 +28,11 @@ class ColorUtils:
 		peak = codes[index_max]
 		return '#%02x%02x%02x' % tuple(int(i) for i in peak)
 
-	def createColorToolButtonIcon(imageFile, color):
+	def createColorToolButtonIcon(icon, color):
 		pixmap = QPixmap(50, 80)
 		pixmap.fill(Qt.transparent)
 		painter = QPainter(pixmap)
-		image = QPixmap(imageFile)
+		image = icon.pixmap(QSize(50, 80))
 		target = QRect(0, 0, 50, 60)
 		source = QRect(0, 0, 42, 42)
 		painter.fillRect(QRect(0, 60, 50, 80), color)

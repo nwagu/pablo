@@ -315,7 +315,6 @@ class MainWindow(QMainWindow):
 			else:
 				action.setChecked(False)
 
-
 	def _find(self):
 		ff = find.Find(self)
 		ff.show()
