@@ -54,14 +54,14 @@ class MenuBar(QMenuBar):
 		
 
 	def createActions(self):
-		self.parent.new_action  = QAction(qta.icon('fa5s.file'), "&New", self.parent, shortcut=QKeySequence.New, statusTip="Create a New File", triggered=self.parent.newFile)
+		self.parent.new_action  = QAction(qta.icon('fa5s.file', color='gray'), "&New", self.parent, shortcut=QKeySequence.New, statusTip="Create a New File", triggered=self.parent.newFile)
 		self.parent.open_action = QAction(qta.icon('fa5s.file'), "O&pen", self.parent, shortcut=QKeySequence.Open, statusTip="Open an existing file", triggered=self.parent.open)
 		self.parent.save_action = QAction(qta.icon('fa5s.save'), "&Save", self.parent, shortcut=QKeySequence.Save, statusTip="Save the current file to disk", triggered=self.parent.save)
 		self.parent.save_as_action = QAction("Save &As...", self.parent, shortcut=QKeySequence.SaveAs, statusTip="Save the current file under a new name", triggered=self.parent.saveAs)
 		self.parent.print_action = QAction(qta.icon('fa5s.print'), "&Print...", self.parent, shortcut=QKeySequence.Print, statusTip="Print the current file", triggered=self.parent.print_)
 		self.parent.exit_action = QAction(QIcon.fromTheme("application-exit"), "E&xit", self.parent, shortcut="Ctrl+Q", statusTip="Exit the Application", triggered=self.close)
 		self.parent.cut_action = QAction(qta.icon('fa5s.cut'), "C&ut", self.parent, shortcut=QKeySequence.Cut, statusTip="Cut the current selection to clipboard", triggered=self.parent.paged_text_edit.cut)
-		self.parent.copy_action = QAction(qta.icon('fa5s.copy'), "C&opy", self.parent, shortcut=QKeySequence.Copy, statusTip="Copy the current selection to clipboard", triggered=self.parent.paged_text_edit.copy)
+		self.parent.copy_action = QAction(qta.icon('fa5s.copy', color='gray'), "C&opy", self.parent, shortcut=QKeySequence.Copy, statusTip="Copy the current selection to clipboard", triggered=self.parent.paged_text_edit.copy)
 		self.parent.paste_action = QAction(qta.icon('fa5s.paste'), "&Paste", self.parent, shortcut=QKeySequence.Paste, statusTip="Paste the clipboard's content in current location", triggered=self.parent.paged_text_edit.paste)
 		self.parent.select_all_action = QAction("Select All", self.parent, statusTip="Select All", triggered=self.parent.paged_text_edit.selectAll)
 		self.parent.redo_action = QAction(qta.icon('fa5s.redo'),"Redo", self.parent, shortcut=QKeySequence.Redo, statusTip="Redo previous action", triggered=self.parent.paged_text_edit.redo)

@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
 		self.curPage = (0, 0) # Tuple containing current page and total pages of the current file
 
 		self.setWindowTitle('Pablo Editor')
-		self.setWindowIcon(QIcon('src/images/icon.png'))
+		self.setWindowIcon(QIcon(GenUtils.resource_path('src/images/icon.ico')))
 		self.setWindowState(Qt.WindowFullScreen)
 		self.setWindowState(Qt.WindowMaximized)
 		# available_geometry = app.desktop().availableGeometry(self)

@@ -1,0 +1,7 @@
+('src/images',
+ 'src/images',
+ [],
+ 'DATA',
+ [('src/images\\icon.ico', 'src/images\\icon.ico', 'DATA'),
+  ('src/images\\icon.png', 'src/images\\icon.png', 'DATA'),
+  ('src/images\\splash.png', 'src/images\\splash.png', 'DATA')])
