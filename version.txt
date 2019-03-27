@@ -18,7 +18,7 @@ VSVersionInfo(
         StringStruct(u'FileDescription', u'Pablo Writer'),
         StringStruct(u'FileVersion', u'1.0'),
         StringStruct(u'InternalName', u'pablo'),
-        StringStruct(u'LegalCopyright', u' '),
+        StringStruct(u'LegalCopyright', u'Copyright \xa9 2019'),
         StringStruct(u'OriginalFilename', u'pablo.exe'),
         StringStruct(u'ProductName', u'Pablo Writer'),
         StringStruct(u'ProductVersion', u'1.0')])
