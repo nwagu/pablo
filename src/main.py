@@ -373,7 +373,7 @@ class MainWindow(QMainWindow):
 		mainColorHex = ColorUtils.getDominantColorFromImage(Image.open(themePath))
 
 		self.setStyleSheet("QMainWindow { background-color: " + mainColorHex + " }")
-		self.nav_panel.setStyleSheet("QScrollArea { background-color: " + mainColorHex  + "ca }")
+		self.nav_panel.setStyleSheet("QScrollArea { background-color: " + mainColorHex  + " }")
 
 
 if __name__ == '__main__':

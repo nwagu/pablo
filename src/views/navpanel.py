@@ -12,7 +12,7 @@ from PIL import Image
 
 class NavPanel(QScrollArea):
 
-	CURRENT_PAGE = 0
+	CURRENT_PAGE = 1
 	
 	def __init__(self, parent=None):
 		super(NavPanel, self).__init__()
@@ -40,12 +40,11 @@ class NavPanel(QScrollArea):
 		self.stacked_widget.addWidget(self.formatPage)
 		self.stacked_widget.addWidget(self.sectionsPage)
 		self.stacked_widget.addWidget(self.themesPage)
-		# self.setCurrentPage(1)
 
 		self.setWidget(self.stacked_widget)
 		self.setWidgetResizable(True)
 
-	def setCurrentPage(self, page):
+	def setCurrentPage(self, page=CURRENT_PAGE):
 		if(page == 1):
 			self.stacked_widget.setCurrentWidget(self.formatPage)
 		elif(page == 2):
@@ -212,5 +211,6 @@ class ThemesPage(QWidget):
 
 				t_vlayout.addWidget(theme_view)
 
+		# TODO Add extra bottom widget for use to use and get custom themes
 
 		self.setLayout(t_vlayout)

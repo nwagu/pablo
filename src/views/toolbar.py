@@ -19,7 +19,7 @@ class ToolBar(QToolBar):
 		self.setFixedWidth(45)
 
 		self.setObjectName("MyToolBar")
-		self.setStyleSheet("QToolBar#MyToolBar { background-color: transparent; border: none; } .QToolButton { margin-bottom: 10px; margin-top: 10px; } ")
+		self.setStyleSheet("QToolBar#MyToolBar { background-color: transparent; border: none; } .QToolButton { margin-bottom: 15px; margin-top: 10px; border: none; } ")
 
 		self.createActions()
 		self.createTools()
@@ -29,9 +29,9 @@ class ToolBar(QToolBar):
 			self.addAction(action)
 		
 	def createActions(self):
-		format_icon = qta.icon('fa5s.file', selected='fa5s.file', color_off='gray', color_off_active='white', color_on='white', color_on_active='white')
-		sections_icon = qta.icon('fa5s.bookmark', selected='fa5s.bookmark', color_off='gray', color_off_active='white', color_on='white', color_on_active='white')
-		themes_icon = qta.icon('fa5s.cog', selected='fa5s.cog', color_off='gray', color_off_active='white', color_on='white', color_on_active='white')
+		format_icon = qta.icon('fa5s.keyboard', selected='fa5s.keyboard', color_off='gray', color_off_active='white', color_on='white', color_on_active='white')
+		sections_icon = qta.icon('fa5s.book-open', selected='fa5s.book-open', color_off='gray', color_off_active='white', color_on='white', color_on_active='white')
+		themes_icon = qta.icon('fa5s.images', selected='fa5s.images', color_off='gray', color_off_active='white', color_on='white', color_on_active='white')
 
 		self.parent.tool_bar_actions = (QAction(format_icon, "&Format", self.parent, checkable=True, statusTip = "Format", triggered=(lambda page=1: self.parent.navSelectorClicked(page))),
 				QAction(sections_icon, "&Sections", self.parent, checkable=True, statusTip = "Sections", triggered=(lambda page=2: self.parent.navSelectorClicked(page))),
