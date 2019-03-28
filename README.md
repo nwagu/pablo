@@ -1,7 +1,7 @@
 # Pablo
 The best text editor for creative writers
 
-![Mar  23 10 36](https://user-images.githubusercontent.com/29481787/54864454-eae6d280-4d57-11e9-88f8-f71f964cee59.jpg)
+![Screenshot](screenshots/1.jpg?raw=true "Screenshot")
 
 The keywords are: <b>Simple</b>, <b>Light</b>, <b>Powerful</b>
 
@@ -25,7 +25,7 @@ If you have Python 3.6 installed, you may quickly run the main.py file inside th
 `pyinstaller pablo-file.spec`
 
 ### Roadmap
-See ROADMAP.md
+See [ROADMAP.md](ROADMAP.md)
 
 ### Contribute
 See CONTRIBUTE.md
