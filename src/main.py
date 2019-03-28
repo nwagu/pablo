@@ -9,9 +9,10 @@ from ext import find, wordcount
 from utils.colorutils import ColorUtils
 from utils.genutils import GenUtils
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
+from PySide2.QtCore import Qt, QMarginsF, Slot, QSettings, QPoint, QSize, QFile, QFileInfo, QTextStream
+from PySide2.QtGui import QPageSize, QPixmap, QTextCharFormat, QTextDocument, QIcon, QFont
+from PySide2.QtWidgets import QApplication, QMainWindow, QFrame, QHBoxLayout, QDialog, QProgressBar
+from PySide2.QtWidgets import QFileDialog, QMessageBox, QSplashScreen
 from PySide2.QtPrintSupport import QPrintDialog, QPrinter
 from PIL import Image
 
@@ -379,11 +380,15 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
 
 	app = QApplication(sys.argv)
-	pixmap = QPixmap(GenUtils.resource_path("src/images/splash.png"))
+	pixmap = QPixmap(GenUtils.resource_path("src/images/splash.jpg"))
 	splash = QSplashScreen(pixmap, Qt.WindowStaysOnTopHint)
 
 	progressBar = QProgressBar(splash)
+	progressBar.setFixedSize(splash.width(), 5)
+	progressBar.setTextVisible(False)
+	progressBar.setStyleSheet(" QProgressBar { background-color: red; } QProgressBar::chunk { background-color: orange }")
 	splash.setMask(pixmap.mask())
+
 	splash.show()
 	for i in range(0, 100):
 		progressBar.setValue(i)

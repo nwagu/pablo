@@ -14,7 +14,15 @@ You are Aladdin!
 ### Build
 If you have Python 3.6 installed, you may quickly run the main.py file inside the src folder.
 
-<a href="https://www.pyinstaller.org/">PyInstaller</a> is default for building a standalone application: run the pablo.spec file like this: `pyinstaller pablo.spec`
+<a href="https://www.pyinstaller.org/">PyInstaller</a> is default for building a standalone application: run the pablo.spec file like this:
+
+--onedir mode (recommended):
+
+`pyinstaller pablo-dir.spec` 
+
+--onefile mode:
+
+`pyinstaller pablo-file.spec`
 
 ### Roadmap
 See ROADMAP.md

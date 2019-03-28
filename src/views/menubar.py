@@ -2,8 +2,6 @@
 from PySide2.QtWidgets import QMenuBar, QAction
 from PySide2.QtGui import QIcon, QKeySequence
 
-import qtawesome as qta
-
 from utils.genutils import GenUtils
 
 class MenuBar(QMenuBar):
@@ -54,23 +52,23 @@ class MenuBar(QMenuBar):
 		
 
 	def createActions(self):
-		self.parent.new_action  = QAction(qta.icon('fa5s.file', color='gray'), "&New", self.parent, shortcut=QKeySequence.New, statusTip="Create a New File", triggered=self.parent.newFile)
-		self.parent.open_action = QAction(qta.icon('fa5s.file'), "O&pen", self.parent, shortcut=QKeySequence.Open, statusTip="Open an existing file", triggered=self.parent.open)
-		self.parent.save_action = QAction(qta.icon('fa5s.save'), "&Save", self.parent, shortcut=QKeySequence.Save, statusTip="Save the current file to disk", triggered=self.parent.save)
+		self.parent.new_action  = QAction("&New", self.parent, shortcut=QKeySequence.New, statusTip="Create a New File", triggered=self.parent.newFile)
+		self.parent.open_action = QAction("O&pen", self.parent, shortcut=QKeySequence.Open, statusTip="Open an existing file", triggered=self.parent.open)
+		self.parent.save_action = QAction("&Save", self.parent, shortcut=QKeySequence.Save, statusTip="Save the current file to disk", triggered=self.parent.save)
 		self.parent.save_as_action = QAction("Save &As...", self.parent, shortcut=QKeySequence.SaveAs, statusTip="Save the current file under a new name", triggered=self.parent.saveAs)
-		self.parent.print_action = QAction(qta.icon('fa5s.print'), "&Print...", self.parent, shortcut=QKeySequence.Print, statusTip="Print the current file", triggered=self.parent.print_)
-		self.parent.exit_action = QAction(QIcon.fromTheme("application-exit"), "E&xit", self.parent, shortcut="Ctrl+Q", statusTip="Exit the Application", triggered=self.close)
-		self.parent.cut_action = QAction(qta.icon('fa5s.cut'), "C&ut", self.parent, shortcut=QKeySequence.Cut, statusTip="Cut the current selection to clipboard", triggered=self.parent.paged_text_edit.cut)
-		self.parent.copy_action = QAction(qta.icon('fa5s.copy', color='gray'), "C&opy", self.parent, shortcut=QKeySequence.Copy, statusTip="Copy the current selection to clipboard", triggered=self.parent.paged_text_edit.copy)
-		self.parent.paste_action = QAction(qta.icon('fa5s.paste'), "&Paste", self.parent, shortcut=QKeySequence.Paste, statusTip="Paste the clipboard's content in current location", triggered=self.parent.paged_text_edit.paste)
+		self.parent.print_action = QAction("&Print...", self.parent, shortcut=QKeySequence.Print, statusTip="Print the current file", triggered=self.parent.print_)
+		self.parent.exit_action = QAction("E&xit", self.parent, shortcut="Ctrl+Q", statusTip="Exit the Application", triggered=self.close)
+		self.parent.cut_action = QAction("C&ut", self.parent, shortcut=QKeySequence.Cut, statusTip="Cut the current selection to clipboard", triggered=self.parent.paged_text_edit.cut)
+		self.parent.copy_action = QAction("C&opy", self.parent, shortcut=QKeySequence.Copy, statusTip="Copy the current selection to clipboard", triggered=self.parent.paged_text_edit.copy)
+		self.parent.paste_action = QAction("&Paste", self.parent, shortcut=QKeySequence.Paste, statusTip="Paste the clipboard's content in current location", triggered=self.parent.paged_text_edit.paste)
 		self.parent.select_all_action = QAction("Select All", self.parent, statusTip="Select All", triggered=self.parent.paged_text_edit.selectAll)
-		self.parent.redo_action = QAction(qta.icon('fa5s.redo'),"Redo", self.parent, shortcut=QKeySequence.Redo, statusTip="Redo previous action", triggered=self.parent.paged_text_edit.redo)
-		self.parent.undo_action = QAction(qta.icon('fa5s.undo'),"Undo", self.parent, shortcut=QKeySequence.Undo, statusTip="Undo previous action", triggered=self.parent.paged_text_edit.undo)
+		self.parent.redo_action = QAction("Redo", self.parent, shortcut=QKeySequence.Redo, statusTip="Redo previous action", triggered=self.parent.paged_text_edit.redo)
+		self.parent.undo_action = QAction("Undo", self.parent, shortcut=QKeySequence.Undo, statusTip="Undo previous action", triggered=self.parent.paged_text_edit.undo)
 		self.parent.themes_action = QAction("&Themes...", self.parent, statusTip = "Themes", triggered = self.parent.fontChange)
-		self.parent.about_action = QAction('A&bout', self.parent, shortcut = QKeySequence(QKeySequence.HelpContents), triggered=self.parent.about_pablo)
-		self.parent.find_action = QAction(qta.icon('fa5s.search'), '&Find', self.parent, shortcut = QKeySequence(QKeySequence.Find), triggered=self.parent._find)
-		self.parent.word_count_action = QAction('Word Count', self.parent, shortcut = "Ctrl+W", triggered=self.parent.showWordCount)
-		self.parent.image_action = QAction('I&mage', self.parent, shortcut = "Ctrl+Shift+I", statusTip = "Insert image", triggered=self.parent.insertImage)
+		self.parent.about_action = QAction("A&bout", self.parent, shortcut = QKeySequence(QKeySequence.HelpContents), triggered=self.parent.about_pablo)
+		self.parent.find_action = QAction("&Find", self.parent, shortcut = QKeySequence(QKeySequence.Find), triggered=self.parent._find)
+		self.parent.word_count_action = QAction("Word Count", self.parent, shortcut = "Ctrl+W", triggered=self.parent.showWordCount)
+		self.parent.image_action = QAction("I&mage", self.parent, shortcut = "Ctrl+Shift+I", statusTip = "Insert image", triggered=self.parent.insertImage)
 		
 		self.parent.cut_action.setEnabled(False)
 		self.parent.copy_action.setEnabled(False)

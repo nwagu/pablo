@@ -2,8 +2,9 @@
 import os
 
 from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QScrollArea, QWidget, QLayout, QStackedWidget, QMenu, QVBoxLayout, QHBoxLayout, QAction, QFontComboBox, QComboBox, QSizePolicy, QToolButton
 from PySide2.QtGui import QPixmap, QFont, QColor, QIcon, QKeySequence, QIntValidator, QImage
+from PySide2.QtWidgets import QScrollArea, QWidget, QLayout, QStackedWidget, QMenu, QVBoxLayout
+from PySide2.QtWidgets import QHBoxLayout, QAction, QFontComboBox, QComboBox, QSizePolicy, QToolButton
 import qtawesome as qta
 from views.themethumb import ThemeThumb
 from utils.colorutils import ColorUtils
