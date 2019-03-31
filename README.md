@@ -16,9 +16,9 @@ If you have Python 3.6 installed, you may quickly run the main.py file inside th
 
 <a href="https://www.pyinstaller.org/">PyInstaller</a> is default for building a standalone application: run the pablo.spec file like these:
 
-`pyinstaller pablo-dir.spec` for --onedir mode (recommended), or
+`pyinstaller build-dir.spec` for --onedir mode (recommended as it loads app quicker), or
 
-`pyinstaller pablo-file.spec` for --onefile mode
+`pyinstaller build-file.spec` for --onefile mode
 
 ### Roadmap
 See [ROADMAP.md](ROADMAP.md)

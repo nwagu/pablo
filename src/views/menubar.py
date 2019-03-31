@@ -20,8 +20,7 @@ class MenuBar(QMenuBar):
 	def createMenus(self):
 		self.file_menu = self.addMenu("&File")
 		self.edit_menu = self.addMenu("&Edit")
-		self.themes_menu = self.addMenu("&Themes")
-		self.about_menu = self.addMenu("&About")
+		self.help_menu = self.addMenu("&Help")
 
 		self.file_menu.addAction(self.parent.new_action)
 		self.file_menu.addAction(self.parent.open_action)
@@ -29,6 +28,8 @@ class MenuBar(QMenuBar):
 		self.file_menu.addAction(self.parent.save_as_action)
 		self.file_menu.addSeparator()
 		self.file_menu.addAction(self.parent.print_action)
+		self.file_menu.addSeparator()
+		self.file_menu.addAction(self.parent.settings_action)
 		self.file_menu.addSeparator()
 		self.file_menu.addAction(self.parent.exit_action)
 
@@ -47,8 +48,7 @@ class MenuBar(QMenuBar):
 		self.edit_menu.addSeparator()
 		self.edit_menu.addAction(self.parent.image_action)
 		
-		self.themes_menu.addAction(self.parent.themes_action)
-		self.about_menu.addAction(self.parent.about_action)
+		self.help_menu.addAction(self.parent.about_action)
 		
 
 	def createActions(self):
@@ -64,7 +64,7 @@ class MenuBar(QMenuBar):
 		self.parent.select_all_action = QAction("Select All", self.parent, statusTip="Select All", triggered=self.parent.paged_text_edit.selectAll)
 		self.parent.redo_action = QAction("Redo", self.parent, shortcut=QKeySequence.Redo, statusTip="Redo previous action", triggered=self.parent.paged_text_edit.redo)
 		self.parent.undo_action = QAction("Undo", self.parent, shortcut=QKeySequence.Undo, statusTip="Undo previous action", triggered=self.parent.paged_text_edit.undo)
-		self.parent.themes_action = QAction("&Themes...", self.parent, statusTip = "Themes", triggered = self.parent.fontChange)
+		self.parent.settings_action = QAction("&Preferences...", self.parent, statusTip = "Preferences", triggered = self.parent.fontChange)
 		self.parent.about_action = QAction("A&bout", self.parent, shortcut = QKeySequence(QKeySequence.HelpContents), triggered=self.parent.about_pablo)
 		self.parent.find_action = QAction("&Find", self.parent, shortcut = QKeySequence(QKeySequence.Find), triggered=self.parent._find)
 		self.parent.word_count_action = QAction("Word Count", self.parent, shortcut = "Ctrl+W", triggered=self.parent.showWordCount)

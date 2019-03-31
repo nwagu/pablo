@@ -3,7 +3,7 @@ import os
 
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPixmap, QFont, QColor, QIcon, QKeySequence, QIntValidator, QImage
-from PySide2.QtWidgets import QScrollArea, QWidget, QLayout, QStackedWidget, QMenu, QVBoxLayout
+from PySide2.QtWidgets import QScrollArea, QWidget, QLabel, QLayout, QStackedWidget, QMenu, QVBoxLayout
 from PySide2.QtWidgets import QHBoxLayout, QAction, QFontComboBox, QComboBox, QSizePolicy, QToolButton
 import qtawesome as qta
 from views.themethumb import ThemeThumb
@@ -20,8 +20,7 @@ class NavPanel(QScrollArea):
 
 		self.parent = parent
 
-		self.setObjectName("MyNavPanel")
-		self.setStyleSheet("QScrollArea#MyNavPanel { border: none; border-left: 1px solid white; }")
+		self.createActions()
 		
 		self.setFixedWidth(200)
 		sizePolicy = QSizePolicy()
@@ -32,7 +31,10 @@ class NavPanel(QScrollArea):
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
 		self.stacked_widget = QStackedWidget()
-		self.stacked_widget.setStyleSheet(".QStackedWidget {background-color: transparent; border: none ;}")
+		self.stacked_widget.setStyleSheet(""".QStackedWidget {
+				background-color: transparent; 
+				border: none ;
+			} """)
 
 		self.formatPage = FormatPage(self.parent)
 		self.sectionsPage = SectionsPage(self.parent)
@@ -44,6 +46,7 @@ class NavPanel(QScrollArea):
 
 		self.setWidget(self.stacked_widget)
 		self.setWidgetResizable(True)
+
 
 	def setCurrentPage(self, page=CURRENT_PAGE):
 		if(page == 1):
@@ -71,6 +74,48 @@ class NavPanel(QScrollArea):
 	def toggleVisibility(self):
 		self.setVisible(not self.isVisible())
 
+	def setThemeColor(self, themeColor):
+		self.setStyleSheet(""" QScrollArea { 
+				background-color: """ + themeColor  + """;
+				border: none; 
+				border-left: 1px solid white; 
+			} """)
+
+		self.verticalScrollBar().setStyleSheet(""" QScrollBar:vertical {
+				border: none;
+				background: """ + themeColor + """ ;
+				width: 8px;
+				margin: 0;
+			}
+			QScrollBar::handle:vertical {
+				background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ffffff, stop:1 #8f8f8f);
+				min-height: 20px;
+				border-radius: 3px;
+			}
+			QScrollBar::add-line:vertical {
+				border: none;
+				background: """ + themeColor + """ ;
+				height: 0px;
+				subcontrol-position: bottom;
+				subcontrol-origin: margin;
+			}
+			QScrollBar::sub-line:vertical {
+				border: none;
+				background: """ + themeColor + """ ;
+				height: 0px;
+				subcontrol-position: top;
+				subcontrol-origin: margin;
+			}
+			QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+				border: none;
+				width: 0px;
+				height: 0px;
+				background: white;
+			}
+			QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+				background: none;
+			} """)
+
 	def updateFormatWidgets(self, format):
 		"""Responsible for updating font widgets when cursor position is changed.
 		Checks for bold, italic, underline, font size, font family and font color in selected text. """
@@ -82,6 +127,11 @@ class NavPanel(QScrollArea):
 		self.parent.edit_actions[0].setChecked(True if format.fontWeight() == QFont.Bold else False)
 		self.parent.edit_actions[1].setChecked(format.fontItalic())
 		self.parent.edit_actions[2].setChecked(format.fontUnderline())
+
+	def createActions(self):
+		self.parent.toggle_nav_action = QAction("Navigation", self.parent, shortcut="Ctrl+T", statusTip="Toggle Navigation")
+		self.parent.toggle_nav_action.triggered.connect(self.toggleVisibility)
+		self.parent.addAction(self.parent.toggle_nav_action)
             
 
 class FormatPage(QWidget):
@@ -94,6 +144,10 @@ class FormatPage(QWidget):
 
 		f_vlayout = QVBoxLayout()
 		f_vlayout.setMargin(0)
+		f_vlayout.setContentsMargins(0, 0, 0, 0)
+		f_vlayout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+		f_vlayout.setDirection(QVBoxLayout.TopToBottom)
+		f_vlayout.setSpacing(10)
 
 		self.fontCombo = QFontComboBox()
 		self.fontCombo.currentFontChanged[QFont].connect(self.parent._fontFamily)
@@ -137,13 +191,17 @@ class FormatPage(QWidget):
 			indentLay.addWidget(button)
 		self.indentBar.setLayout(indentLay)
 
+		f_vlayout.addWidget(NavTitle("Properties"))
 		f_vlayout.addWidget(self.fontCombo)
 		f_vlayout.addWidget(self.fontSizeCombo)
 		f_vlayout.addWidget(self.fontColorToolButton)
 		f_vlayout.addWidget(self.pageScaleCombo)
 		f_vlayout.addWidget(self.editBar)
+		f_vlayout.addWidget(NavTitle("Paragraph"))
 		f_vlayout.addWidget(self.indentBar)
+		f_vlayout.addWidget(NavTitle("Show advanced options"))
 
+		f_vlayout.addStretch(1)
 		self.setLayout(f_vlayout)
 
 	def createActions(self):
@@ -151,10 +209,10 @@ class FormatPage(QWidget):
 		self.parent.edit_actions = (QAction(qta.icon('fa5s.bold'), "Bold", self.parent, checkable=True, shortcut=QKeySequence.Bold, triggered=self.parent._bold),
 				QAction(qta.icon('fa5s.italic'), "Italic", self.parent, checkable=True, shortcut=QKeySequence.Italic, triggered=self.parent._italic),
 				QAction(qta.icon('fa5s.underline'), "Underline", self.parent, checkable=True, shortcut=QKeySequence.Underline, triggered=self.parent._underline))
-		self.parent.indent_actions = (QAction(qta.icon('fa5s.align-left'), "Left", self.parent, checkable=True, statusTip="Left indent", triggered=(lambda align=Qt.AlignLeft: self.parent._indent(align))),
-				QAction(qta.icon('fa5s.align-right'), "Right", self.parent, checkable=True, statusTip="Right indent", triggered=(lambda align=Qt.AlignRight: self.parent._indent(align))),
+		self.parent.indent_actions = (QAction(qta.icon('fa5s.align-left'), "Left", self.parent, checkable=True, shortcut="Ctrl+L", statusTip="Left indent", triggered=(lambda align=Qt.AlignLeft: self.parent._indent(align))),
+				QAction(qta.icon('fa5s.align-right'), "Right", self.parent, checkable=True, shortcut="Ctrl+R", statusTip="Right indent", triggered=(lambda align=Qt.AlignRight: self.parent._indent(align))),
 				QAction(qta.icon('fa5s.align-center'), "Center", self.parent, checkable=True, shortcut="Ctrl+E", statusTip="Center indent", triggered=(lambda align=Qt.AlignCenter: self.parent._indent(align))),
-				QAction(qta.icon('fa5s.align-justify'), "Justify", self.parent, checkable=True, statusTip="Justify indent", triggered=(lambda align=Qt.AlignJustify: self.parent._indent(align))))
+				QAction(qta.icon('fa5s.align-justify'), "Justify", self.parent, checkable=True, shortcut="Ctrl+J", statusTip="Justify indent", triggered=(lambda align=Qt.AlignJustify: self.parent._indent(align))))
 
 	def createColorMenu(self, slot, defaultColor):
 		colors = [Qt.black, Qt.white, Qt.red, Qt.blue, Qt.yellow]
@@ -183,6 +241,20 @@ class SectionsPage(QWidget):
 
 		self.parent = parent
 
+		s_vlayout = QVBoxLayout()
+		s_vlayout.setMargin(0)
+		s_vlayout.setContentsMargins(0, 0, 0, 0)
+		s_vlayout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+		s_vlayout.setDirection(QVBoxLayout.TopToBottom)
+		s_vlayout.setSpacing(6)
+
+		s_vlayout.addWidget(NavTitle("Sections"))
+
+		# TODO Add thumbnails of document sections
+
+		s_vlayout.addStretch(1)
+		self.setLayout(s_vlayout)
+
 class ThemesPage(QWidget):
 	def __init__(self, parent=None):
 		super().__init__()
@@ -191,6 +263,12 @@ class ThemesPage(QWidget):
 
 		t_vlayout = QVBoxLayout()
 		t_vlayout.setMargin(0)
+		t_vlayout.setContentsMargins(0, 0, 0, 0)
+		t_vlayout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+		t_vlayout.setDirection(QVBoxLayout.TopToBottom)
+		t_vlayout.setSpacing(10)
+
+		t_vlayout.addWidget(NavTitle("Themes"))
 
 		themedir = GenUtils.resource_path('src/themes')
 		for theme in os.listdir(themedir):
@@ -203,7 +281,7 @@ class ThemesPage(QWidget):
 				# Convert PIL Image to QImage. The PIL ImageQT class failed to do this for me
 				im = im.convert("RGBA")
 				data = im.tobytes('raw', "RGBA")
-				qim = QImage(data, im.size[0], im.size[1], QImage.Format_ARGB32)
+				qim = QImage(data, im.size[0], im.size[1], QImage.Format_RGBA8888)
 
 				pixmap = QPixmap.fromImage(qim)
 				theme_view = ThemeThumb()
@@ -214,4 +292,20 @@ class ThemesPage(QWidget):
 
 		# TODO Add extra bottom widget for use to use and get custom themes
 
+		t_vlayout.addWidget(NavTitle("Select custom themes"))
+
+		t_vlayout.addStretch(1)
 		self.setLayout(t_vlayout)
+
+
+class NavTitle(QLabel):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.setStyleSheet(""" 
+				color: white; 
+				margin: 10px; 
+				font-weight: 300; 
+				font-family: Comic Sans MS; 
+			""")
+

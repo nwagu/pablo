@@ -96,7 +96,7 @@ class PagedTextEdit(QTextEdit):
 			pageHeight = self.m_pageMetrics.pxPageSize().height()
 
 			# Calculate indents for viewport
-			DEFAULT_TOP_MARGIN = 0
+			DEFAULT_TOP_MARGIN = 5
 			DEFAULT_BOTTOM_MARGIN = 0
 			leftMargin = 0
 			rightMargin = 0
