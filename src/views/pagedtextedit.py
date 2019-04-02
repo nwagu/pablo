@@ -291,4 +291,83 @@ class PagedTextEdit(QTextEdit):
 			rootFrameFormat.setRightMargin(rootFrameMargins.right())
 			rootFrameFormat.setBottomMargin(rootFrameMargins.bottom())
 			self.document().rootFrame().setFrameFormat(rootFrameFormat)
+
+	def setThemeColor(self, themeColor):
+		self.verticalScrollBar().setStyleSheet(""" QScrollBar:vertical {
+				border: none;
+				background: """ + themeColor + """ ;
+				width: 15px;
+				margin: 20, 0, 20, 0;
+			}
+			QScrollBar::handle:vertical {
+				background: #8f8f8f;
+				min-height: 20px;
+				border-radius: 3px;
+			}
+			QScrollBar::handle:vertical:hover {
+				background: white;
+			}
+			QScrollBar::add-line:vertical {
+				border: none;
+				background: """ + themeColor + """ ;
+				height: 20px;
+				subcontrol-position: bottom;
+				subcontrol-origin: margin;
+			}
+			QScrollBar::sub-line:vertical {
+				border: none;
+				background: """ + themeColor + """ ;
+				height: 20px;
+				subcontrol-position: top;
+				subcontrol-origin: margin;
+			}
+			QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+				border: none;
+				width: 5px;
+				height: 5px;
+				background: white;
+			}
+			QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+				background: none;
+			} """)
+
+		self.horizontalScrollBar().setStyleSheet(""" QScrollBar:horizontal {
+				border: none;
+				background: """ + themeColor + """ ;
+				width: 12px;
+				margin: 20, 0, 20, 0;
+			}
+			QScrollBar::handle:horizontal {
+				background: #8f8f8f;
+				min-height: 20px;
+				border-radius: 3px;
+			}
+			QScrollBar::handle:horizontal:hover {
+				background: white;
+			}
+			QScrollBar::add-line:horizontal {
+				border: none;
+				background: """ + themeColor + """ ;
+				height: 20px;
+				subcontrol-position: bottom;
+				subcontrol-origin: margin;
+			}
+			QScrollBar::sub-line:horizontal {
+				border: none;
+				background: """ + themeColor + """ ;
+				height: 20px;
+				subcontrol-position: top;
+				subcontrol-origin: margin;
+			}
+			QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal {
+				border: none;
+				width: 5px;
+				height: 5px;
+				background: white;
+			}
+			QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+				background: none;
+			} """)
+
+
 			

@@ -64,22 +64,26 @@ class NavPanel(QScrollArea):
 
 		if(not pageChanged):
 			self.toggleVisibility()
+		else:
+			self.highlightActiveToolButton()
 
+	def toggleVisibility(self):
+		self.setVisible(not self.isVisible())
+		self.highlightActiveToolButton()
+
+	def highlightActiveToolButton(self):
 		for index, action in enumerate(self.parent.tool_bar_actions, start=1):
 			if (index == self.CURRENT_PAGE and self.isVisible()):
 				action.setChecked(True)
 			else:
 				action.setChecked(False)
 
-	def toggleVisibility(self):
-		self.setVisible(not self.isVisible())
-
 	def setThemeColor(self, themeColor):
 		self.setStyleSheet(""" QScrollArea { 
 				background-color: """ + themeColor  + """;
 				border: none; 
 				border-left: 1px solid white; 
-			} """)
+			}""")
 
 		self.verticalScrollBar().setStyleSheet(""" QScrollBar:vertical {
 				border: none;
@@ -88,9 +92,12 @@ class NavPanel(QScrollArea):
 				margin: 0;
 			}
 			QScrollBar::handle:vertical {
-				background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ffffff, stop:1 #8f8f8f);
+				background: #8f8f8f;
 				min-height: 20px;
 				border-radius: 3px;
+			}
+			QScrollBar::handle:vertical:hover {
+				background: white;
 			}
 			QScrollBar::add-line:vertical {
 				border: none;

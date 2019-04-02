@@ -368,13 +368,16 @@ class MainWindow(QMainWindow):
 		self.statusBar.writeWordCount(wordCountInfo)
 
 	def setTheme(self, themePath):
-
-		self.dropView.dropImage(themePath)
-
+		# Get theme color from theme image
 		mainColorHex = ColorUtils.getDominantColorFromImage(Image.open(themePath))
 
+		# Set image as main background
+		self.dropView.dropImage(themePath)
 		self.setStyleSheet("QMainWindow { background-color: " + mainColorHex + " }")
+
+		# Set theme color on other views in the application appropriately
 		self.nav_panel.setThemeColor(mainColorHex)
+		self.paged_text_edit.setThemeColor(mainColorHex)
 
 
 if __name__ == '__main__':
