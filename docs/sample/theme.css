@@ -1,0 +1,254 @@
+/* 	Theme Name: sykra
+	created: March 2016
+	by Chukwuemeka Nwagu
+*/
+
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,
+address,big,cite,code,del,dfn,em,font,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,dl,
+dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td {
+	border:0;
+	margin:0;
+	outline:0;
+	padding:0;
+	font-weight: normal;
+	vertical-align: baseline;}
+
+html,body{
+	margin: 0;
+	padding: 0;
+	background: none;
+	x-overflow: ;
+	-webkit-text-size-adjust:100%;
+	-ms-text-size-adjust:100%;}
+	
+body {
+	font-family: Matterhorn, Helvetica, Arial, sans-serif;}
+	
+a {
+	color: #000000;
+	text-decoration: none;}
+
+a:hover,a:focus,a:active{
+	color: #000000;}
+	
+ol,ul {
+	list-style:none}
+	
+hr {
+	width: 100%;
+	border: none;
+	border-bottom: 1px solid #ccc;}
+	
+table {
+	}
+	
+th {
+	font-weight: bold;}
+	
+button, input, select, textarea {
+	font-size: 100%;
+	margin:0;
+	vertical-align: baseline;
+	*vertical-align:middle;
+	-ms-box-sizing:border-box;
+	-moz-box-sizing:border-box;
+	-webkit-box-sizing:border-box;
+	box-sizing:border-box;}
+	
+button, input{
+	line-height:normal;
+	*overflow: visible;}
+
+button, html input[type="button"],input[type="reset"],input[type="submit"] {
+	padding:12px 20px;
+	border: solid 1px #000000;
+	background: green;
+	background:-webkit-gradient(linear, left bottom, left top, color-stop(0, #dfdfdf), color-stop(1, #ffffff));
+	background:-ms-linear-gradient(bottom, #dfdfdf, #ffffff);
+	background:-moz-linear-gradient(center bottom, #dfdfdf 0%, #ffffff 100%);
+	background:-o-linear-gradient(#ffffff, #dfdfdf);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#dfdfdf', GradientType=0);
+	-webkit-border-radius:3px;
+	-moz-border-radius:3px;
+	border-radius:3px;
+	font-size: 12px;
+	font-weight: bold;
+	color: #000000;
+	-webkit-box-shadow:0 1px 1px rgba(0,0,0,0.125), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+	-moz-box-shadow:0 1px 1px rgba(0,0,0,0.125), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+	box-shadow:0 1px 1px rgba(0,0,0,0.125), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+	width: ;
+	text-decoration: none;
+	cursor: pointer;
+	-webkit-appearance:button;
+	line-height: 1;
+	text-shadow:0 1px 0 rgba(255, 255, 255, 0.8);}
+
+button:hover,html input[type="button"]:hover,input[type="reset"]:hover,input[type="submit"]:hover {
+	border-top:solid 1px #dadada;
+	border-left:solid 1px #cfcfcf;
+	border-right:solid 1px #cfcfcf;
+	border-bottom:solid 1px #a8a8a8;
+	background: blue;
+	background:-webkit-gradient(linear, left bottom, left top, color-stop(0, #ebebeb), color-stop(1, #ffffff));
+	background:-ms-linear-gradient(bottom, #ebebeb, #ffffff);
+	background:-moz-linear-gradient(center bottom, #ebebeb 0%, #ffffff 100%);
+	background:-o-linear-gradient(#ffffff, #ebebeb);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#ebebeb', GradientType=0);}
+	
+button:focus,html input[type="button"]:focus,input[type="reset"]:focus,input[type="submit"]:focus,button:active,html input[type="button"]:active,input[type="reset"]:active,input[type="submit"]:active {
+	border: solid 1px #aaaaaa;
+	-webkit-box-shadow:inset 0 -1px 0 rgba(255, 255, 255, 0.5), inset 0 2px 5px rgba(0, 0, 0, 0.15);
+	-moz-box-shadow:inset 0 -1px 0 rgba(255, 255, 255, 0.5), inset 0 2px 5px rgba(0, 0, 0, 0.15);
+	box-shadow:inset 0 -1px 0 rgba(255, 255, 255, 0.5), inset 0 2px 5px rgba(0, 0, 0, 0.15);}
+	
+input[type="checkbox"],input[type="radio"] {
+	-ms-box-sizing:border-box;
+	-moz-box-sizing:border-box;
+	-webkit-box-sizing:border-box;
+	box-sizing:border-box;
+	padding:0;}
+	
+input[type="search"] {
+	-webkit-appearance:textfield;
+	-ms-box-sizing:border-box;
+	-moz-box-sizing:border-box;
+	-webkit-box-sizing:border-box;
+	box-sizing:border-box;}
+	
+input[type="search"]::-webkit-search-decoration {
+	-webkit-appearance: none;}
+	
+button::-moz-focus-inner,input::-moz-focus-inner {
+	border:0;
+	padding:0;}
+	
+input[type=text],input[type=email],input[type=password],textarea {
+	-ms-box-sizing:border-box;
+	-moz-box-sizing:border-box;
+	-webkit-box-sizing:border-box;
+	box-sizing:border-box;
+	color: red;
+	border:1px solid #000000;
+	border-radius:3px;}
+	
+input[type=text]:focus,input[type=email]:focus,input[type=password]:focus,textarea:focus {
+	color:#111;}
+	
+input[type=text],input[type=email],input[type=password] {
+	padding:3px;}
+	
+textarea {
+	overflow:auto;
+	vertical-align:top;}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+
+	
+blockquote:before,blockquote:after,q:before,q:after {
+	content:"";}
+	
+blockquote,q {
+	quotes:"" "";}
+
+audio,canvas,video{display:inline-block;*display:inline;*zoom:1;}
+
+audio:not([controls]){display:none}
+
+sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline;}
+
+sup{top:-0.5em}
+
+sub{bottom:-0.25em}
+
+
+
+/**
+@media print {
+  * {
+    text-shadow: none !important;
+    color: #000 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  a,
+  a:visited {
+    text-decoration: underline;
+  }
+  a[href]:after {
+    content: " (" attr(href) ")";
+  }
+  abbr[title]:after {
+    content: " (" attr(title) ")";
+  }
+  a[href^="javascript:"]:after,
+  a[href^="#"]:after {
+    content: "";
+  }
+  pre,
+  blockquote {
+    border: 1px solid #999;
+    page-break-inside: avoid;
+  }
+  thead {
+    display: table-header-group;
+  }
+  tr,
+  img {
+    page-break-inside: avoid;
+  }
+  img {
+    max-width: 100% !important;
+  }
+  p,
+  h2,
+  h3 {
+    orphans: 3;
+    widows: 3;
+  }
+  h2,
+  h3 {
+    page-break-after: avoid;
+  }
+  select {
+    background: #fff !important;
+  }
+  .navbar {
+    display: none;
+  }
+  .table td,
+  .table th {
+    background-color: #fff !important;
+  }
+  .btn > .caret,
+  .dropup > .btn > .caret {
+    border-top-color: #000 !important;
+  }
+  .label {
+    border: 1px solid #000;
+  }
+  .table {
+    border-collapse: collapse !important;
+  }
+  .table-bordered th,
+  .table-bordered td {
+    border: 1px solid #ddd !important;
+  }
+} **/
+
+
+
+n::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0;}
