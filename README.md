@@ -20,6 +20,8 @@ If you have Python 3.6 installed, you may quickly run the main.py file inside th
 
 `pyinstaller build-file.spec` for --onefile mode
 
+NSIS is used to create a setup file for Windows users
+
 ### Roadmap
 See [ROADMAP.md](ROADMAP.md)
 

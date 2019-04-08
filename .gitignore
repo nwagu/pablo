@@ -1,0 +1,5 @@
+virtualenv/
+.vscode/
+build/
+dist/
+NSIS/
