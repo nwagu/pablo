@@ -1,4 +1,4 @@
-virtualenv/
+'virtualenv'
 .vscode/
 build/
 dist/
