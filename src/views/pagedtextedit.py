@@ -297,7 +297,7 @@ class PagedTextEdit(QTextEdit):
 				border: none;
 				background: """ + themeColor + """ ;
 				width: 15px;
-				margin: 20, 0, 20, 0;
+				margin: 20, 20, 0, 0;
 			}
 			QScrollBar::handle:vertical {
 				background: #8f8f8f;
@@ -313,6 +313,7 @@ class PagedTextEdit(QTextEdit):
 				height: 20px;
 				subcontrol-position: bottom;
 				subcontrol-origin: margin;
+				border-radius: 3px;
 			}
 			QScrollBar::sub-line:vertical {
 				border: none;
@@ -320,6 +321,10 @@ class PagedTextEdit(QTextEdit):
 				height: 20px;
 				subcontrol-position: top;
 				subcontrol-origin: margin;
+				border-radius: 3px;
+			}
+			QScrollBar::add-line:vertical:hover, QScrollBar::sub-line:vertical:hover {
+				background: #8f8f8f;
 			}
 			QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
 				border: none;
@@ -358,6 +363,9 @@ class PagedTextEdit(QTextEdit):
 				height: 20px;
 				subcontrol-position: top;
 				subcontrol-origin: margin;
+			}
+			QScrollBar::add-line:horizontal:hover, QScrollBar::sub-line:horizontal:hover {
+				background: #8f8f8f;
 			}
 			QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal {
 				border: none;

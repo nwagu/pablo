@@ -16,6 +16,9 @@ class StatusBar(QStatusBar):
 		
 
 	def createLabels(self):
+		self.cursorPositionLabel = ClickableLabel()
+		self.addPermanentWidget(self.cursorPositionLabel)
+
 		self.wordCountLabel = ClickableLabel()
 		self.wordCountLabel.clicked.connect(self.parent.word_count_action.triggered.emit)
 		self.addPermanentWidget(self.wordCountLabel)
@@ -32,3 +35,6 @@ class StatusBar(QStatusBar):
 
 	def writePageInfo(self, message):
 		self.pageInfoStatusLabel.setText(message)
+
+	def writeCursorPosition(self, message):
+		self.cursorPositionLabel.setText(message)

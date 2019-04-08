@@ -1,0 +1,21 @@
+<pbl><head>
+<meta name="qrichtext" content="1">
+<style type="text/css">
+p, li { white-space: pre-wrap; }
+</style>
+</head><body style=" font-family:'Calibri'; font-size:12pt; font-weight:400; font-style:normal;">
+<table style="-qt-table-type: root; margin-top:56.693px; margin-bottom:56.693px; margin-left:56.693px; margin-right:56.693px;">
+<tr>
+<td style="border: none;">
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Consolas,Courier New,monospace'; font-size:14px; color:#008000;">mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm nnnnnnnnnnnnnnnnnnnn nnnnnnnnnnnnnnn</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Consolas,Courier New,monospace'; font-size:14px; color:#008000;"><br></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Consolas,Courier New,monospace'; font-size:14px; color:#000000;">CursorPosition()</span></p>
+<pre style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Consolas,Courier New,monospace'; font-size:14px; color:#000000;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span><span style=" font-family:'Consolas,Courier New,monospace'; font-size:14px; color:#0000ff;">self</span><span style=" font-family:'Consolas,Courier New,monospace'; font-size:14px; color:#000000;">.nav_panel.updateIndentW   idgets(</span><span style=" font-family:'Consolas,Courier New,monospace'; font-size:14px; color:#0000ff;">self</span><span style=" font-family:'Consolas,Courier New,monospace'; font-size:14px; color:#000000;">.paged_text_edit.alignment())</span></pre>
+<pre style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Consolas,Courier New,monospace'; font-size:14px; color:#000000;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span><span style=" font-family:'Consolas,Courier New,monospace'; font-size:14px; color:#008000;"># list = self.paged_text_edit.textCursor().currentList()</span></pre>
+<pre style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Consolas,Courier New,monospace'; font-size:14px; color:#000000;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span><span style=" font-family:'Consolas,Courier New,monospace'; font-size:14px; color:#008000;"># if(list):</span></pre>
+<pre style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Consolas,Courier New,monospace'; font-size:14px; color:#000000;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span><span style=" font-family:'Consolas,Courier New,monospace'; font-size:14px; color:#008000;"># &#160;&#160;self.nav_panel.updateListWidgets(list.format())</span></pre>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Consolas,Courier New,monospace'; font-size:14px; color:#000000;"><br>hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh</span></p>
+</td>
+</tr>
+</table>
+</body></pbl>

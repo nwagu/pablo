@@ -33,7 +33,7 @@ class ToolBar(QToolBar):
 		sections_icon = qta.icon('fa5s.book-open', selected='fa5s.book-open', color_off='gray', color_off_active='white', color_on='white', color_on_active='white')
 		themes_icon = qta.icon('fa5s.images', selected='fa5s.images', color_off='gray', color_off_active='white', color_on='white', color_on_active='white')
 
-		self.parent.tool_bar_actions = (QAction(format_icon, "&Format", self.parent, checkable=True, statusTip = "Format", triggered=(lambda page=1: self.parent.navSelectorClicked(page))),
-				QAction(sections_icon, "&Sections", self.parent, checkable=True, statusTip = "Sections", triggered=(lambda page=2: self.parent.navSelectorClicked(page))),
-				QAction(themes_icon, "&Themes", self.parent, checkable=True, statusTip = "Themes", triggered=(lambda page=3: self.parent.navSelectorClicked(page))))
+		self.parent.tool_bar_actions = (QAction(format_icon, "Format", self.parent, checkable=True, statusTip = "Format", triggered=(lambda page=1: self.parent.navSelectorClicked(page))),
+				QAction(sections_icon, "Sections", self.parent, checkable=True, statusTip = "Sections", triggered=(lambda page=2: self.parent.navSelectorClicked(page))),
+				QAction(themes_icon, "Themes", self.parent, checkable=True, statusTip = "Themes", triggered=(lambda page=3: self.parent.navSelectorClicked(page))))
 	

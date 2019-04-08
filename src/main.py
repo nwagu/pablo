@@ -59,6 +59,7 @@ class MainWindow(QMainWindow):
 		font.setPointSize(12)
 		font.setFamily('Calibri')
 		doc.setDefaultFont(font)
+		# doc.setDefaultStyleSheet("body { font-color: black; font-family: Calibri; font-size: 12;} ")
 		self.paged_text_edit.setDocument(doc)
 		self.paged_text_edit.setPageFormat(QPageSize.A5Extra)
 		self.paged_text_edit.setPageMargins(QMarginsF(15, 15, 15, 15))
@@ -89,7 +90,7 @@ class MainWindow(QMainWindow):
 		self.setCurrentFile('')
 		self.paged_text_edit.document().contentsChanged.connect(self.documentWasModified)
 		self.paged_text_edit.currentCharFormatChanged.connect(self.updateFontWidgets)
-		self.paged_text_edit.cursorPositionChanged.connect(self.updateIndentWidgets)
+		self.paged_text_edit.cursorPositionChanged.connect(self.updatePositions)
 		self.paged_text_edit.pageInfo.connect(self.readPageInfo)
 		
 		self.statusBar.writeMessageOnStatus("Ready", 10000)
@@ -225,11 +226,6 @@ class MainWindow(QMainWindow):
 
 	def strippedName(self, fullFileName):
 		return QFileInfo(fullFileName).fileName()
-
-	def fontChange(self):
-		(font, ok) = QFontDialog.getFont(QFont("Helvetica[Cronyx]", 10), self)
-		if ok:
-			self.paged_text_edit.setCurrentFont(font)
 	
 	def closeEvent(self, event):
 		if self.maybeSave():
@@ -251,37 +247,65 @@ class MainWindow(QMainWindow):
 		settings.setValue("size", self.size())
 		
 	def _bold(self):
-		format = QTextCharFormat()
-		format.setFontWeight(QFont.Bold if self.edit_actions[0].isChecked() else QFont.Normal)
-		self.paged_text_edit.mergeCurrentCharFormat(format)
+		# format = QTextCharFormat()
+		# format.setFontWeight(QFont.Bold if self.edit_actions[0].isChecked() else QFont.Normal)
+		# self.paged_text_edit.mergeCurrentCharFormat(format)
+ 
+		if self.paged_text_edit.fontWeight() == QFont.Bold:
+			self.paged_text_edit.setFontWeight(QFont.Normal)
+		else:
+			self.paged_text_edit.setFontWeight(QFont.Bold)
 		
 	def _italic(self):
-		format = QTextCharFormat()
-		format.setFontItalic(self.edit_actions[1].isChecked())
-		self.paged_text_edit.mergeCurrentCharFormat(format)
+		# format = QTextCharFormat()
+		# format.setFontItalic(self.edit_actions[1].isChecked())
+		# self.paged_text_edit.mergeCurrentCharFormat(format)
+
+		state = self.paged_text_edit.fontItalic()
+		self.paged_text_edit.setFontItalic(not state)
 		
 	def _underline(self):
-		format = QTextCharFormat()
-		format.setFontUnderline(self.edit_actions[2].isChecked())
-		self.paged_text_edit.mergeCurrentCharFormat(format)
+		# format = QTextCharFormat()
+		# format.setFontUnderline(self.edit_actions[2].isChecked())
+		# self.paged_text_edit.mergeCurrentCharFormat(format)
+
+		state = self.paged_text_edit.fontUnderline()
+		self.paged_text_edit.setFontUnderline(not state)
+
+	def _strike(self):
+		format = self.paged_text_edit.currentCharFormat()
+		format.setFontStrikeOut(not format.fontStrikeOut())
+		self.paged_text_edit.setCurrentCharFormat(format)
+	
+	def _superscript(self):
+		format = self.paged_text_edit.currentCharFormat()
+		align = format.verticalAlignment()
+		if(align == QTextCharFormat.AlignNormal):
+			format.setVerticalAlignment(QTextCharFormat.AlignSuperScript)
+		else:
+			format.setVerticalAlignment(QTextCharFormat.AlignNormal)
+		self.paged_text_edit.setCurrentCharFormat(format)
+	
+	def _subscript(self):
+		format = self.paged_text_edit.currentCharFormat()
+		align = format.verticalAlignment()
+		if(align == QTextCharFormat.AlignNormal):
+			format.setVerticalAlignment(QTextCharFormat.AlignSubScript)
+		else:
+			format.setVerticalAlignment(QTextCharFormat.AlignNormal)
+		self.paged_text_edit.setCurrentCharFormat(format)
 		
 	def _fontFamily(self, font):
-		format = QTextCharFormat()
-		format.setFontFamily(font.family())
-		self.paged_text_edit.mergeCurrentCharFormat(format)
+		self.paged_text_edit.setFontFamily(font.family())
 
 	def _fontSize(self, size):
-		format = QTextCharFormat()
-		format.setFontPointSize(int(size))
-		self.paged_text_edit.mergeCurrentCharFormat(format)
+		self.paged_text_edit.setFontPointSize(int(size))
 
 	def _fontColor(self, color):
-		format = QTextCharFormat()
-		format.setForeground(color)
-		self.paged_text_edit.mergeCurrentCharFormat(format)
+		self.paged_text_edit.setTextColor(color)
 
 	def pageScaleChanged(self, scale):
-		pass
+		self.paged_text_edit.setPageFormat(GenUtils.getPageFormatFromString(scale))
 
 	def _indent(self, alignment):
 		
@@ -294,31 +318,31 @@ class MainWindow(QMainWindow):
 		else:
 				self.paged_text_edit.setAlignment(alignment)
 
-		self.updateIndentWidgets()
+		self.nav_panel.updateIndentWidgets(alignment)
+
+	def _list(self, listType):
+		cursor = self.paged_text_edit.textCursor()
+		if(cursor.currentList()):
+			cursor.insertList(listType)
+		else:
+			cursor.createList(listType)
 		
-
-
 	@Slot(QTextCharFormat)
 	def updateFontWidgets(self, format):
 		self.nav_panel.updateFormatWidgets(format)
 
-	def updateIndentWidgets(self):
-		"""Responsible for updating indent widgets."""
-
-		indentID = GenUtils.getIndentID(self.paged_text_edit.alignment())
-
-		for index, action in enumerate(self.indent_actions, start=1):
-			if(index == indentID):
-				action.setChecked(True)
-			else:
-				action.setChecked(False)
+	def updatePositions(self):
+		self.updateCursorPosition()
+		self.nav_panel.updateIndentWidgets(self.paged_text_edit.alignment())
+		# list = self.paged_text_edit.textCursor().currentList()
+		# if(list):
+		# 	self.nav_panel.updateListWidgets(list.format())
 
 	def _find(self):
 		ff = find.Find(self)
 		ff.show()
 
 	def insertImage(self):
-
 		# Get image file name
 		filename = QFileDialog.getOpenFileName(self, 
 					'Insert image',".","Images (*.png *.xpm *.jpg *.bmp *.gif)")[0]
@@ -329,11 +353,8 @@ class MainWindow(QMainWindow):
 		# Error if unloadable
 		if image.isNull():
 
-			popup = QMessageBox(QMessageBox.Critical,
-									"Image load error",
-									"Could not load image file!",
-									QMessageBox.Ok,
-									self)
+			popup = QMessageBox(QMessageBox.Critical,"Image load error",
+									"Could not load image file!",QMessageBox.Ok, self)
 			popup.show()
 
 		else:
@@ -364,8 +385,15 @@ class MainWindow(QMainWindow):
 
 	def updateWordCount(self):
 		count = GenUtils.count_words(self.paged_text_edit.toPlainText())
-		wordCountInfo = count[0] + " words;  " + count[1] + " symbols   "
+		# Generate string and add 's' when quantity is more than one
+		wordCountInfo = "{} {}, {} {}   ".format(count[0], "words" if count[0] > 1 else "word", count[1], "symbols" if count[1] > 1 else "symbol")
 		self.statusBar.writeWordCount(wordCountInfo)
+
+	def updateCursorPosition(self):
+		cursor = self.paged_text_edit.textCursor()
+		line = cursor.blockNumber() + 1 # index to start from 1
+		col = cursor.columnNumber() + 1 # index to start from 1
+		self.statusBar.writeCursorPosition("Ln: {}, Col: {}   ".format(line, col))
 
 	def setTheme(self, themePath):
 		# Get theme color from theme image
