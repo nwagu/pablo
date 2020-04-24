@@ -1,5 +1,5 @@
 # Pablo
-The best text editor for creative writers
+A text editor for creative writers
 
 ![Screenshot](screenshots/1.jpg?raw=true "Screenshot")
 
